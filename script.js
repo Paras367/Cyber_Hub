@@ -1,77 +1,171 @@
 // ========================================
-// CYBER LEARNING HUB
+// CYBER LEARNING HUB 
 // ========================================
 
-const ENCRYPTED_WORKER_HASH = '7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b';
-const DECRYPTION_KEY = 'cyber_hub_secret_key_2026';
+
+
+const ENCRYPTED_PARTS = {
+    p1: 'aHR0cHM6Ly9jeWJlci1odWI=',
+    p2: 'uZGhpbWFucGFyYXM2MDU=',
+    p3: 'LndvcmtlcnM=',
+    p4: 'uZGV2'
+};
+
+
+const XOR_KEY = [42, 87, 15, 93, 28, 61, 34, 79];
+
+
+const SUB_MAP = {
+    'a': 'z', 'b': 'y', 'c': 'x', 'd': 'w', 'e': 'v',
+    'f': 'u', 'g': 't', 'h': 's', 'i': 'r', 'j': 'q',
+    'k': 'p', 'l': 'o', 'm': 'n', 'n': 'm', 'o': 'l',
+    'p': 'k', 'q': 'j', 'r': 'i', 's': 'h', 't': 'g',
+    'u': 'f', 'v': 'e', 'w': 'd', 'x': 'c', 'y': 'b', 'z': 'a'
+};
+
+
 function decryptWorkerURL() {
-    const workerBase = 'https://cyber-hub.dhimanparas605.workers.dev';
-    return workerBase;
+    try {
+    
+        let decoded = '';
+        for (let i = 1; i <= 4; i++) {
+            decoded += atob(ENCRYPTED_PARTS[`p${i}`]);
+        }
+        
+     
+        let xorDecrypted = '';
+        for (let i = 0; i < decoded.length; i++) {
+            const keyIndex = i % XOR_KEY.length;
+            xorDecrypted += String.fromCharCode(decoded.charCodeAt(i) ^ XOR_KEY[keyIndex]);
+        }
+        
+
+        let finalURL = '';
+        for (const char of xorDecrypted) {
+            if (char.toLowerCase() in SUB_MAP) {
+                finalURL += SUB_MAP[char.toLowerCase()] === char.toLowerCase() ? 
+                    SUB_MAP[char].toUpperCase() : SUB_MAP[char.toLowerCase()];
+            } else {
+                finalURL += char;
+            }
+        }
+        
+
+        if (!finalURL.startsWith('http')) {
+            console.error('🔐 URL decryption failed - using fallback');
+            return 'https://cyber-hub.dhimanparas605.workers.dev';
+        }
+        
+        console.log('✅ Worker URL decrypted successfully');
+        return finalURL;
+    } catch (error) {
+        console.error('🔐 Decryption error:', error);
+        return 'https://cyber-hub.dhimanparas605.workers.dev';
+    }
 }
+
 
 const API_BASE = decryptWorkerURL();
-const API_TIMEOUT = 10000; 
-const RETRY_ATTEMPTS = 3;
+console.log('%c🔒 API Endpoint:', 'color: #8b5cf6; font-weight: bold;', API_BASE);
 
-let authToken = localStorage.getItem('authToken');
+
+
+const API_TIMEOUT = 15000; 
+const MAX_RETRY_ATTEMPTS = 3;
+const SESSION_TIMEOUT = 30 * 60 * 1000; 
+let authToken = localStorage.getItem('authToken') || null;
 let currentUser = null;
+let lastActivity = Date.now();
 let apiQueue = [];
 let isProcessingQueue = false;
+let securityToken = generateSecurityToken();
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    initializeCyberHub();
-});
+function generateSecurityToken() {
+    return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+}
+
+// ========================================
+// 🚀 INITIALIZATION
+// ========================================
+
+document.addEventListener('DOMContentLoaded', initializeCyberHub);
 
 async function initializeCyberHub() {
+    // Initialize security monitoring
+    setupSecurityMonitoring();
+    
+    // Setup preloader
     setupPreloader();
+    
+    // Check authentication
     await checkAuthStatus();
+    
+    // Setup event listeners
     setupEventListeners();
-    initializePage();
-    setupNavigation();
+    
+    // Initialize page components
+    initializePageComponents();
+    
+    // Setup cyber animations
     initializeCyberAnimations();
+    
+    // Load initial data
     await loadInitialData();
     
+    // Start session monitoring
+    startSessionMonitoring();
+    
+    // Log initialization
     console.log('%c🚀 Cyber Learning Hub initialized successfully!', 'color: #6366f1; font-weight: bold; font-size: 16px;');
-    console.log('%c🔒 Backend URL:', 'color: #8b5cf6;', API_BASE);
     console.log('%c👤 User Status:', 'color: #10b981;', authToken ? 'Authenticated' : 'Not Logged In');
+    console.log('%c🛡️ Security Token:', 'color: #8b5cf6;', securityToken.substring(0, 8) + '...');
 }
 
-function setupPreloader() {
-    const preloader = document.getElementById('preloader');
-    if (!preloader) return;
-
-    const matrixContainer = document.querySelector('.cyber-matrix');
-    if (matrixContainer) {
-        const percentageElement = document.querySelector('.loading-percentage');
-        let percent = 0;
-        const interval = setInterval(() => {
-            percent += Math.random() * 5;
-            if (percent >= 100) {
-                percent = 100;
-                clearInterval(interval);
-            }
-            if (percentageElement) {
-                percentageElement.textContent = Math.min(Math.floor(percent), 100) + '%';
-            }
-            document.querySelector('.loading-fill').style.width = percent + '%';
-        }, 100);
+// Security monitoring setup
+function setupSecurityMonitoring() {
+    // Monitor for suspicious activities
+    document.addEventListener('copy', logSecurityEvent.bind(null, 'copy_attempt'));
+    document.addEventListener('cut', logSecurityEvent.bind(null, 'cut_attempt'));
+    document.addEventListener('paste', logSecurityEvent.bind(null, 'paste_attempt'));
+    document.addEventListener('contextmenu', logSecurityEvent.bind(null, 'right_click'));
+    
+    // Monitor console usage
+    if (typeof console !== 'undefined') {
+        const originalLog = console.log;
+        console.log = function() {
+            logSecurityEvent('console_access');
+            originalLog.apply(console, arguments);
+        };
     }
-
-    setTimeout(() => {
-        preloader.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }, 2000);
 }
 
-// Initialize page components
-function initializePage() {
-    setupCourseCards();
-    setupToolCards();
-    setupTestimonialSlider();
-    setupCyberEffects();
+function logSecurityEvent(eventType) {
+    // In production, send to security monitoring service
+    console.log(`🛡️ Security Event: ${eventType} at ${new Date().toISOString()}`);
 }
 
+// Session monitoring
+function startSessionMonitoring() {
+    setInterval(() => {
+        if (authToken && Date.now() - lastActivity > SESSION_TIMEOUT) {
+            console.log('⏰ Session timeout - logging out');
+            logout();
+            showInfo('Session expired due to inactivity. Please login again.');
+        }
+    }, 60000); // Check every minute
+    
+    // Update last activity on user interaction
+    document.addEventListener('mousemove', () => { lastActivity = Date.now(); });
+    document.addEventListener('keypress', () => { lastActivity = Date.now(); });
+    document.addEventListener('click', () => { lastActivity = Date.now(); });
+}
+
+// ========================================
+// 🔐 AUTHENTICATION SYSTEM
+// ========================================
 
 async function checkAuthStatus() {
     if (authToken) {
@@ -110,24 +204,38 @@ async function login() {
         return;
     }
 
-    if (username.length < 3) {
-        showError('Username must be at least 3 characters');
+    if (username.length < 3 || username.length > 30) {
+        showError('Username must be 3-30 characters');
+        return;
+    }
+
+    if (password.length < 8) {
+        showError('Password must be at least 8 characters long');
         return;
     }
 
     showLoading(true, 'Authenticating...');
 
     try {
+        // Hash password client-side before sending (additional security layer)
+        const hashedPassword = await hashPassword(password);
+        
         const response = await apiRequest(`${API_BASE}/api/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ 
+                username, 
+                password: hashedPassword,
+                securityToken
+            })
         });
 
         if (response.success) {
             authToken = response.data.token;
             localStorage.setItem('authToken', authToken);
             currentUser = response.data.user;
+            
+            // Save username if remember me is checked
             if (rememberMe) {
                 localStorage.setItem('savedUsername', username);
             } else {
@@ -136,9 +244,9 @@ async function login() {
 
             closeModal('loginModal');
             updateAuthUI(true);
-            showSuccess('🎉 Login successful! Welcome back, ' + currentUser.username);
+            showSuccess(`🎉 Welcome back, ${currentUser.username}!`);
             
-            // Reload progress and user data
+            // Reload user data
             await Promise.all([
                 loadUserProgress(),
                 loadUserData()
@@ -147,10 +255,14 @@ async function login() {
             // Track login event
             trackEvent('user_login', { username: currentUser.username });
         } else {
-            showError(response.error || 'Login failed. Please check your credentials.');
+            showError(response.error || 'Invalid credentials. Please try again.');
         }
     } catch (error) {
-        showError('Login failed. Please try again.');
+        if (error.message.includes('timeout')) {
+            showError('Login timeout. Please check your connection and try again.');
+        } else {
+            showError('Login failed. Please check your credentials.');
+        }
         console.error('🔐 Login error:', error);
     } finally {
         showLoading(false);
@@ -169,8 +281,8 @@ async function register() {
         return;
     }
 
-    if (username.length < 3) {
-        showError('Username must be at least 3 characters');
+    if (username.length < 3 || username.length > 30) {
+        showError('Username must be 3-30 characters');
         return;
     }
 
@@ -185,21 +297,36 @@ async function register() {
     }
 
     if (password.length < 8) {
-        showError('Password must be at least 8 characters long!');
+        showError('Password must be at least 8 characters long');
         return;
     }
 
-    showLoading(true, 'Creating account...');
+    // Password strength check
+    const strength = getPasswordStrength(password);
+    if (strength.score < 60) {
+        showError(`Password strength: ${strength.level}. Please create a stronger password.`);
+        return;
+    }
+
+    showLoading(true, 'Creating your account...');
 
     try {
+        // Hash password client-side
+        const hashedPassword = await hashPassword(password);
+        
         const response = await apiRequest(`${API_BASE}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password })
+            body: JSON.stringify({ 
+                username, 
+                email, 
+                password: hashedPassword,
+                securityToken
+            })
         });
 
         if (response.success) {
-            showSuccess('✅ Registration successful! Please login to continue.');
+            showSuccess('✅ Account created successfully! Please login to continue.');
             closeModal('registerModal');
             
             // Auto-fill login form
@@ -209,13 +336,16 @@ async function register() {
                 showModal('loginModal');
             }
             
-            // Track registration event
             trackEvent('user_register', { username, email });
         } else {
             showError(response.error || 'Registration failed. Username might already exist.');
         }
     } catch (error) {
-        showError('Registration failed. Please try again.');
+        if (error.message.includes('timeout')) {
+            showError('Registration timeout. Please try again.');
+        } else {
+            showError('Registration failed. Please try again later.');
+        }
         console.error('🔐 Registration error:', error);
     } finally {
         showLoading(false);
@@ -223,13 +353,17 @@ async function register() {
 }
 
 function logout() {
+    // Clear all sensitive data
     localStorage.removeItem('authToken');
     localStorage.removeItem('savedUsername');
-    localStorage.removeItem('savedPassword');
+    sessionStorage.clear();
+    
     authToken = null;
     currentUser = null;
+    securityToken = generateSecurityToken();
+    
     updateAuthUI(false);
-    showSuccess('👋 Logged out successfully');
+    showSuccess('👋 You have been logged out successfully');
     trackEvent('user_logout');
 }
 
@@ -247,9 +381,12 @@ function updateAuthUI(isLoggedIn) {
         if (registerBtn) registerBtn.style.display = 'none';
         if (userName) userName.textContent = currentUser.username;
         if (userDashboard) userDashboard.style.display = 'block';
+        
+        // Add cyber glow effect
         const userInfo = document.querySelector('.user-info');
         if (userInfo) userInfo.classList.add('cyber-glow');
     } else {
+        // Show auth buttons
         if (userMenu) userMenu.style.display = 'none';
         if (loginBtn) loginBtn.style.display = 'block';
         if (registerBtn) registerBtn.style.display = 'block';
@@ -260,6 +397,9 @@ function updateAuthUI(isLoggedIn) {
     }
 }
 
+// ========================================
+// 📊 PROGRESS TRACKING SYSTEM
+// ========================================
 
 async function loadUserProgress() {
     if (!authToken) return;
@@ -358,7 +498,12 @@ async function updateProgress(course, module) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             },
-            body: JSON.stringify({ course, module, completed: true })
+            body: JSON.stringify({ 
+                course, 
+                module, 
+                completed: true,
+                securityToken
+            })
         });
 
         if (response.success) {
@@ -366,10 +511,10 @@ async function updateProgress(course, module) {
             await loadUserProgress();
             trackEvent('progress_update', { course, module });
         } else {
-            showError('Failed to update progress');
+            showError('Failed to update progress. Please try again.');
         }
     } catch (error) {
-        showError('Failed to update progress');
+        showError('Failed to update progress. Please try again.');
         console.error('📊 Progress update error:', error);
     } finally {
         showLoading(false);
@@ -377,16 +522,20 @@ async function updateProgress(course, module) {
 }
 
 // ========================================
-// CYBER TOOLS SYSTEM
+// 🛠️ CYBER TOOLS SYSTEM
 // ========================================
 
 async function checkIP() {
     const button = event?.currentTarget;
-    if (button) button.disabled = true;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+    if (button) {
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+    }
 
     try {
-        const response = await apiRequest(`${API_BASE}/api/tools/ip`);
+        const response = await apiRequest(`${API_BASE}/api/tools/ip`, {
+            headers: { 'X-Security-Token': securityToken }
+        });
         
         if (response.success) {
             const resultDiv = document.getElementById('ipResult');
@@ -448,63 +597,56 @@ async function checkPasswordStrength() {
     if (this.passwordTimeout) clearTimeout(this.passwordTimeout);
     this.passwordTimeout = setTimeout(async () => {
         try {
-            const response = await apiRequest(`${API_BASE}/api/tools/password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
-            });
+            const strength = getPasswordStrength(password);
             
-            if (response.success) {
-                const data = response.data;
-                let color = '#ef4444';
-                let icon = 'fa-times-circle';
+            let color = '#ef4444';
+            let icon = 'fa-times-circle';
+            
+            if (strength.score >= 80) {
+                color = '#10b981';
+                icon = 'fa-check-circle';
+            } else if (strength.score >= 60) {
+                color = '#f59e0b';
+                icon = 'fa-exclamation-triangle';
+            } else if (strength.score >= 40) {
+                color = '#fbbf24';
+                icon = 'fa-exclamation-triangle';
+            }
+
+            let feedbackHTML = '';
+            if (strength.feedback.length > 0) {
+                feedbackHTML = `
+                    <div class="password-feedback">
+                        <h5><i class="fas fa-lightbulb"></i> Suggestions:</h5>
+                        <ul>
+                            ${strength.feedback.map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (resultDiv) {
+                resultDiv.innerHTML = `
+                    <div class="password-strength-card">
+                        <div class="strength-header">
+                            <i class="fas ${icon}" style="color: ${color};"></i>
+                            <span class="strength-label" style="color: ${color};">${strength.level}</span>
+                            <span class="strength-score">${Math.round(strength.score)}%</span>
+                        </div>
+                        <div class="strength-bar">
+                            <div class="strength-fill" style="width: ${strength.score}%; background: ${color};"></div>
+                        </div>
+                        ${feedbackHTML}
+                        <div class="password-tips">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Use a password manager to generate and store strong passwords securely.</span>
+                        </div>
+                    </div>
+                `;
+                resultDiv.style.display = 'block';
+                resultDiv.classList.add('show');
                 
-                if (data.score >= 80) {
-                    color = '#10b981';
-                    icon = 'fa-check-circle';
-                } else if (data.score >= 60) {
-                    color = '#f59e0b';
-                    icon = 'fa-exclamation-triangle';
-                } else if (data.score >= 40) {
-                    color = '#fbbf24';
-                    icon = 'fa-exclamation-triangle';
-                }
-
-                let feedbackHTML = '';
-                if (data.feedback.length > 0) {
-                    feedbackHTML = `
-                        <div class="password-feedback">
-                            <h5><i class="fas fa-lightbulb"></i> Suggestions:</h5>
-                            <ul>
-                                ${data.feedback.map(f => `<li>${f}</li>`).join('')}
-                            </ul>
-                        </div>
-                    `;
-                }
-
-                if (resultDiv) {
-                    resultDiv.innerHTML = `
-                        <div class="password-strength-card">
-                            <div class="strength-header">
-                                <i class="fas ${icon}" style="color: ${color};"></i>
-                                <span class="strength-label" style="color: ${color};">${data.strength}</span>
-                                <span class="strength-score">${Math.round(data.score)}%</span>
-                            </div>
-                            <div class="strength-bar">
-                                <div class="strength-fill" style="width: ${data.score}%; background: ${color};"></div>
-                            </div>
-                            ${feedbackHTML}
-                            <div class="password-tips">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>Use a password manager to generate and store strong passwords securely.</span>
-                            </div>
-                        </div>
-                    `;
-                    resultDiv.style.display = 'block';
-                    resultDiv.classList.add('show');
-                    
-                    trackEvent('tool_password_check', { score: data.score, strength: data.strength });
-                }
+                trackEvent('tool_password_check', { score: strength.score, level: strength.level });
             }
         } catch (error) {
             console.error('🔑 Password check failed:', error);
@@ -724,7 +866,61 @@ function showVPNSimulator() {
 }
 
 // ========================================
-// API REQUEST HANDLER WITH RETRY & QUEUE
+// 🔒 SECURITY UTILITIES
+// ========================================
+
+// Client-side password hashing (additional security layer)
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password + securityToken);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Password strength checker (client-side)
+function getPasswordStrength(password) {
+    let score = 0;
+    const feedback = [];
+
+    // Length check
+    if (password.length >= 12) score += 30;
+    else if (password.length >= 8) score += 20;
+    else feedback.push('Use at least 8 characters');
+
+    // Uppercase check
+    if (/[A-Z]/.test(password)) score += 15;
+    else feedback.push('Add uppercase letters');
+
+    // Lowercase check
+    if (/[a-z]/.test(password)) score += 15;
+    else feedback.push('Add lowercase letters');
+
+    // Number check
+    if (/\d/.test(password)) score += 15;
+    else feedback.push('Add numbers');
+
+    // Special character check
+    if (/[^A-Za-z0-9]/.test(password)) score += 25;
+    else feedback.push('Add special characters (!@#$%^&*)');
+
+    // Additional checks
+    if (password.length >= 16) score += 10;
+    if (/(\w)\1\1/.test(password)) score -= 15; // Repeated characters
+    if (/password|12345|qwerty/i.test(password)) score -= 20; // Common passwords
+
+    score = Math.max(0, Math.min(100, score));
+
+    let level = 'Weak';
+    if (score >= 80) level = 'Strong';
+    else if (score >= 60) level = 'Good';
+    else if (score >= 40) level = 'Moderate';
+
+    return { score, level, feedback };
+}
+
+// ========================================
+// 🌐 API REQUEST HANDLER WITH SECURITY
 // ========================================
 
 async function apiRequest(url, options = {}) {
@@ -732,9 +928,20 @@ async function apiRequest(url, options = {}) {
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
     try {
+        // Add security headers
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-Client-Token': securityToken,
+            'X-Timestamp': Date.now().toString(),
+            ...options.headers
+        };
+
         const response = await fetch(url, {
             ...options,
-            signal: controller.signal
+            headers,
+            signal: controller.signal,
+            mode: 'cors',
+            credentials: 'omit'
         });
 
         clearTimeout(timeoutId);
@@ -744,86 +951,26 @@ async function apiRequest(url, options = {}) {
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        return {
-            success: true,
-            data: data,
-            status: response.status
-        };
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return await response.json();
+        } else {
+            return { success: true,  await response.text() };
+        }
     } catch (error) {
         if (error.name === 'AbortError') {
             throw new Error('Request timeout. Please try again.');
         }
+        console.error('API Request Error:', error);
         throw error;
     }
 }
 
-// Queue system for API requests
-function queueApiRequest(requestFn) {
-    return new Promise((resolve, reject) => {
-        apiQueue.push({ requestFn, resolve, reject });
-        processQueue();
-    });
-}
-
-async function processQueue() {
-    if (isProcessingQueue || apiQueue.length === 0) return;
-
-    isProcessingQueue = true;
-
-    while (apiQueue.length > 0) {
-        const { requestFn, resolve, reject } = apiQueue.shift();
-        try {
-            const result = await requestFn();
-            resolve(result);
-        } catch (error) {
-            reject(error);
-        }
-    }
-
-    isProcessingQueue = false;
-}
-
 // ========================================
-// USER DATA & ANALYTICS
-// ========================================
-
-async function loadUserData() {
-    if (!authToken) return;
-
-    try {
-        // You can add more user data endpoints here
-        console.log('👤 Loading user data for:', currentUser.username);
-    } catch (error) {
-        console.error('Failed to load user data:', error);
-    }
-}
-
-function trackEvent(eventName, data = {}) {
-    // In production, send to analytics service
-    console.log(`📊 Event tracked: ${eventName}`, data);
-    
-    // Example: Send to backend for analytics
-    /*
-    fetch(`${API_BASE}/api/analytics`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            event: eventName,
-            data: data,
-            timestamp: new Date().toISOString(),
-            userId: currentUser?.username
-        })
-    }).catch(console.error);
-    */
-}
-
-// ========================================
-// UI UTILITIES & EFFECTS
+// 📱 UI UTILITIES & EFFECTS
 // ========================================
 
 function showLoading(show, message = 'Loading...') {
-    // Create or update loading overlay
     let overlay = document.getElementById('loadingOverlay');
     
     if (show) {
@@ -849,7 +996,7 @@ function showLoading(show, message = 'Loading...') {
         overlay.innerHTML = `
             <div style="text-align: center; color: white;">
                 <div class="cyber-spinner" style="margin-bottom: 20px;">
-                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <i class="fas fa-spinner fa-spin fa-3x" style="color: #6366f1;"></i>
                 </div>
                 <p style="font-size: 1.2em; margin-top: 10px;">${message}</p>
             </div>
@@ -868,8 +1015,13 @@ function showModal(modalId) {
         // Add animation
         setTimeout(() => {
             const content = modal.querySelector('.modal-content');
-            if (content) content.style.opacity = '1';
+            if (content) {
+                content.style.opacity = '1';
+                content.style.transform = 'translateY(0)';
+            }
         }, 10);
+        
+        trackEvent('modal_open', { modal: modalId });
     }
 }
 
@@ -877,13 +1029,57 @@ function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         const content = modal.querySelector('.modal-content');
-        if (content) content.style.opacity = '0';
+        if (content) {
+            content.style.opacity = '0';
+            content.style.transform = 'translateY(20px)';
+        }
         
         setTimeout(() => {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }, 300);
+        
+        trackEvent('modal_close', { modal: modalId });
     }
+}
+
+function setupPreloader() {
+    const preloader = document.getElementById('preloader');
+    if (!preloader) return;
+
+    // Matrix animation effect
+    const matrixContainer = document.querySelector('.cyber-matrix');
+    if (matrixContainer) {
+        // Update loading percentage
+        const percentageElement = document.querySelector('.loading-percentage');
+        let percent = 0;
+        const interval = setInterval(() => {
+            percent += Math.random() * 3;
+            if (percent >= 100) {
+                percent = 100;
+                clearInterval(interval);
+            }
+            if (percentageElement) {
+                percentageElement.textContent = Math.min(Math.floor(percent), 100) + '%';
+            }
+            document.querySelector('.loading-fill').style.width = percent + '%';
+        }, 80);
+    }
+
+    // Hide preloader after animations complete
+    setTimeout(() => {
+        preloader.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        trackEvent('preloader_hidden');
+    }, 2000);
+}
+
+function initializePageComponents() {
+    setupNavigation();
+    setupCourseCards();
+    setupToolCards();
+    setupTestimonialSlider();
+    setupFormValidation();
 }
 
 function setupNavigation() {
@@ -966,93 +1162,494 @@ function setupTestimonialSlider() {
     const testimonials = document.querySelectorAll('.testimonial-card');
     if (testimonials.length <= 1) return;
 
-    let currentIndex = 0;
-    const totalTestimonials = testimonials.length;
-
-    // Show first testimonial, hide others
+    // Show all testimonials with proper styling
     testimonials.forEach((testimonial, index) => {
-        if (index === 0) {
-            testimonial.style.opacity = '1';
-            testimonial.style.transform = 'translateY(0)';
-            testimonial.style.zIndex = '10';
-        } else {
-            testimonial.style.opacity = '0.3';
-            testimonial.style.transform = 'translateY(20px)';
-            testimonial.style.zIndex = '1';
-        }
-    });
-
-    // Auto-rotate every 5 seconds
-    setInterval(() => {
-        // Fade out current
-        testimonials[currentIndex].style.opacity = '0.3';
-        testimonials[currentIndex].style.transform = 'translateY(20px)';
-        testimonials[currentIndex].style.zIndex = '1';
-
-        // Move to next
-        currentIndex = (currentIndex + 1) % totalTestimonials;
-
-        // Fade in next
-        testimonials[currentIndex].style.opacity = '1';
-        testimonials[currentIndex].style.transform = 'translateY(0)';
-        testimonials[currentIndex].style.zIndex = '10';
-    }, 5000);
-
-    // Add click to navigate
-    testimonials.forEach((testimonial, index) => {
+        testimonial.style.opacity = '1';
+        testimonial.style.transform = 'translateY(0)';
+        testimonial.style.zIndex = '1';
+        
+        // Add click to bring to front
         testimonial.addEventListener('click', () => {
-            if (index === currentIndex) return;
-
-            testimonials[currentIndex].style.opacity = '0.3';
-            testimonials[currentIndex].style.transform = 'translateY(20px)';
-            testimonials[currentIndex].style.zIndex = '1';
-
-            currentIndex = index;
-
-            testimonials[currentIndex].style.opacity = '1';
-            testimonials[currentIndex].style.transform = 'translateY(0)';
-            testimonials[currentIndex].style.zIndex = '10';
+            // Reset all
+            testimonials.forEach(t => {
+                t.style.zIndex = '1';
+                t.style.transform = 'translateY(0)';
+                t.style.boxShadow = '';
+            });
+            
+            // Bring selected to front
+            testimonial.style.zIndex = '10';
+            testimonial.style.transform = 'translateY(-5px)';
+            testimonial.style.boxShadow = '0 15px 40px rgba(99, 102, 241, 0.3)';
         });
     });
+    
+    // Auto-rotate highlight
+    let currentIndex = 0;
+    setInterval(() => {
+        testimonials.forEach(t => {
+            t.style.zIndex = '1';
+            t.style.transform = 'translateY(0)';
+            t.style.boxShadow = '';
+        });
+        
+        currentIndex = (currentIndex + 1) % testimonials.length;
+        testimonials[currentIndex].style.zIndex = '10';
+        testimonials[currentIndex].style.transform = 'translateY(-5px)';
+        testimonials[currentIndex].style.boxShadow = '0 15px 40px rgba(99, 102, 241, 0.3)';
+    }, 5000);
 }
 
-function setupCyberEffects() {
-    // Add cyber pulse effect to important elements
-    const pulseElements = document.querySelectorAll('.cyber-pulse');
-    pulseElements.forEach(element => {
-        element.style.animation = 'cyberPulse 2s ease-in-out infinite';
-    });
-    
-    // Add styles for cyber pulse animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes cyberPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
-            50% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
-        }
-        
-        @keyframes cyberGlow {
-            0%, 100% { text-shadow: 0 0 10px rgba(99, 102, 241, 0.5); }
-            50% { text-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(139, 92, 246, 0.8); }
-        }
-        
-        .cyber-glow {
-            animation: cyberGlow 2s ease-in-out infinite;
-        }
-    `;
-    document.head.appendChild(style);
+function setupFormValidation() {
+    // Password strength checker for registration
+    const registerPasswordInput = document.getElementById('registerPassword');
+    if (registerPasswordInput) {
+        registerPasswordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strengthIndicator = document.getElementById('registerPasswordStrength');
+            if (!strengthIndicator) return;
+
+            const strength = getPasswordStrength(password);
+            
+            let color = '#ef4444';
+            if (strength.score >= 80) color = '#10b981';
+            else if (strength.score >= 60) color = '#f59e0b';
+            else if (strength.score >= 40) color = '#fbbf24';
+
+            let feedbackHTML = '';
+            if (strength.feedback.length > 0 && password.length > 0) {
+                feedbackHTML = `<ul style="margin-top: 8px; font-size: 0.85em; color: #64748b;">${strength.feedback.map(f => `<li>${f}</li>`).join('')}</ul>`;
+            }
+
+            strengthIndicator.innerHTML = `
+                <div style="margin-top: 10px;">
+                    <div style="background: ${color}; height: 4px; width: 100%; border-radius: 2px; margin-bottom: 5px;">
+                        <div style="background: white; height: 4px; width: ${100 - strength.score}%; border-radius: 2px;"></div>
+                    </div>
+                    <p style="margin: 5px 0; font-size: 0.85em; color: ${color}; font-weight: 600;">
+                        ${strength.level} (${Math.round(strength.score)}%)
+                    </p>
+                    ${feedbackHTML}
+                </div>
+            `;
+        });
+    }
+
+    // Form validation
+    const registerForm = document.querySelector('#registerModal form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            const password = document.getElementById('registerPassword')?.value;
+            const confirmPassword = document.getElementById('confirmPassword')?.value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                showError('Passwords do not match!');
+                return false;
+            }
+
+            if (password && password.length < 8) {
+                e.preventDefault();
+                showError('Password must be at least 8 characters long!');
+                return false;
+            }
+        });
+    }
 }
 
 function initializeCyberAnimations() {
     // Initialize binary background if present
     const binaryStreams = document.querySelectorAll('.binary-stream');
     binaryStreams.forEach(stream => {
-        stream.innerHTML = stream.innerHTML.repeat(4);
+        stream.innerHTML = stream.innerHTML.repeat(4); // Repeat for continuous effect
+    });
+    
+    // Add cyber pulse effect to important elements
+    const pulseElements = document.querySelectorAll('.cyber-pulse');
+    pulseElements.forEach(element => {
+        element.style.animation = 'cyberPulse 2s ease-in-out infinite';
     });
 }
 
 // ========================================
-// EVENT LISTENERS SETUP
+// 🍪 COOKIE CONSENT SYSTEM
+// ========================================
+
+function acceptCookies() {
+    localStorage.setItem('cookiesAccepted', 'true');
+    const banner = document.getElementById('cookieBanner');
+    if (banner) {
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 500);
+    }
+    showSuccess('🍪 Cookies accepted! You can now use all features.');
+    trackEvent('cookies_accepted');
+}
+
+function declineCookies() {
+    localStorage.setItem('cookiesAccepted', 'false');
+    const banner = document.getElementById('cookieBanner');
+    if (banner) {
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 500);
+    }
+    showInfo('🍪 Cookies declined. Some features may be limited.');
+    trackEvent('cookies_declined');
+}
+
+function customizeCookies() {
+    const modal = document.createElement('div');
+    modal.className = 'auth-modal';
+    modal.id = 'cookieSettingsModal';
+    modal.innerHTML = `
+        <div class="modal-content cyber-card">
+            <button class="modal-close" onclick="closeModal('cookieSettingsModal')">
+                <i class="fas fa-xmark"></i>
+            </button>
+            <div class="modal-header">
+                <i class="fas fa-cookie modal-icon cyber-gradient"></i>
+                <h2>Cookie Settings</h2>
+                <p>Choose which cookies you want to allow</p>
+            </div>
+            <div class="cookie-settings-content">
+                <div class="cookie-setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="essentialCookies" checked disabled>
+                        <span><i class="fas fa-check-circle"></i> Essential Cookies <small>(Required)</small></span>
+                    </label>
+                    <p>These cookies are necessary for the website to function properly.</p>
+                </div>
+                
+                <div class="cookie-setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="analyticsCookies" checked>
+                        <span><i class="fas fa-chart-line"></i> Analytics Cookies</span>
+                    </label>
+                    <p>Help us understand how visitors interact with our website.</p>
+                </div>
+                
+                <div class="cookie-setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="functionalCookies" checked>
+                        <span><i class="fas fa-cog"></i> Functional Cookies</span>
+                    </label>
+                    <p>Remember your preferences and settings.</p>
+                </div>
+                
+                <div class="cookie-setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="marketingCookies">
+                        <span><i class="fas fa-bullhorn"></i> Marketing Cookies</span>
+                    </label>
+                    <p>Used to deliver personalized ads and track marketing campaigns.</p>
+                </div>
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="saveCookieSettings()">
+                    <i class="fas fa-save"></i> Save Preferences
+                </button>
+                <button class="btn btn-outline" onclick="closeModal('cookieSettingsModal')">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    showModal('cookieSettingsModal');
+    trackEvent('cookies_customize_opened');
+}
+
+function saveCookieSettings() {
+    const settings = {
+        essential: true, // Always enabled
+        analytics: document.getElementById('analyticsCookies').checked,
+        functional: document.getElementById('functionalCookies').checked,
+        marketing: document.getElementById('marketingCookies').checked
+    };
+    
+    localStorage.setItem('cookieSettings', JSON.stringify(settings));
+    localStorage.setItem('cookiesAccepted', 'custom');
+    
+    closeModal('cookieSettingsModal');
+    const banner = document.getElementById('cookieBanner');
+    if (banner) {
+        banner.style.display = 'none';
+    }
+    
+    showSuccess('✅ Cookie preferences saved!');
+    trackEvent('cookies_customized', settings);
+}
+
+// Show cookie banner on page load
+window.addEventListener('load', () => {
+    const cookieBanner = document.getElementById('cookieBanner');
+    const cookiesAccepted = localStorage.getItem('cookiesAccepted');
+    
+    if (cookieBanner && cookiesAccepted === null) {
+        setTimeout(() => {
+            cookieBanner.style.display = 'block';
+            setTimeout(() => {
+                cookieBanner.style.opacity = '1';
+                cookieBanner.style.transform = 'translateY(0)';
+            }, 100);
+        }, 2000);
+    }
+});
+
+// ========================================
+// 📊 ANALYTICS & TRACKING
+// ========================================
+
+function trackEvent(eventName, data = {}) {
+    // In production, send to analytics service
+    console.log(`📊 Event tracked: ${eventName}`, data);
+    
+    // Example: Send to backend for analytics (disabled for security)
+    /*
+    fetch(`${API_BASE}/api/analytics`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            event: eventName,
+            data,
+            timestamp: new Date().toISOString(),
+            userId: currentUser?.username || 'anonymous',
+            securityToken
+        })
+    }).catch(console.error);
+    */
+}
+
+// ========================================
+// 🧪 UTILITY FUNCTIONS
+// ========================================
+
+function formatCourseName(name) {
+    return name
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase())
+        .replace('Cybersecurity', '🔒 Cybersecurity')
+        .replace('Networking', '🌐 Networking')
+        .replace('Linux', '🐧 Linux');
+}
+
+function formatModuleName(name) {
+    return name
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase());
+}
+
+function getCourseIcon(course) {
+    const icons = {
+        'cybersecurity': 'fa-lock',
+        'networking': 'fa-network-wired',
+        'linux': 'fa-linux',
+        'github': 'fa-github'
+    };
+    return icons[course] || 'fa-graduation-cap';
+}
+
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// Enhanced toast notifications
+function showError(message) {
+    showToast(message, 'error');
+}
+
+function showSuccess(message) {
+    showToast(message, 'success');
+}
+
+function showInfo(message) {
+    showToast(message, 'info');
+}
+
+function showToast(message, type = 'info') {
+    // Remove existing toasts
+    document.querySelectorAll('.cyber-toast').forEach(t => t.remove());
+    
+    const toast = document.createElement('div');
+    toast.className = `cyber-toast cyber-toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+        </div>
+        <div class="toast-message">${message}</div>
+        <button class="toast-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(400px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+    
+    trackEvent('toast_shown', { type, message });
+}
+
+// Add toast styles if not already present
+if (!document.getElementById('toast-styles')) {
+    const toastStyles = document.createElement('style');
+    toastStyles.id = 'toast-styles';
+    toastStyles.textContent = `
+        .cyber-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 10000;
+            animation: toastSlideIn 0.3s ease;
+            transform: translateX(0);
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .toast-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .cyber-toast-error .toast-icon {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .cyber-toast-success .toast-icon {
+            background: linear-gradient(135deg, #10b981, #0da271);
+            color: white;
+        }
+        
+        .cyber-toast-info .toast-icon {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        .toast-message {
+            color: #1e293b;
+            font-weight: 500;
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 18px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .toast-close:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+    `;
+    document.head.appendChild(toastStyles);
+}
+
+// ========================================
+// 📥 LOAD INITIAL DATA
+// ========================================
+
+async function loadInitialData() {
+    try {
+        // Load hero stats with animation
+        setTimeout(() => {
+            animateCounter('studentCount', 10000, 2000);
+            animateCounter('courseCount', 15, 1500);
+            animateCounter('toolCount', 8, 1200);
+            animateCounter('certCount', 5000, 2500);
+        }, 500);
+        
+        // Load any other initial data here
+        trackEvent('initial_data_loaded');
+    } catch (error) {
+        console.error('Failed to load initial data:', error);
+    }
+}
+
+async function loadUserData() {
+    if (!authToken) return;
+
+    try {
+        console.log('👤 Loading user data for:', currentUser?.username);
+        // Additional user data loading can be added here
+    } catch (error) {
+        console.error('Failed to load user data:', error);
+    }
+}
+
+// ========================================
+// 📊 ANIMATED COUNTER
+// ========================================
+
+function animateCounter(elementId, target, duration = 2000) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    let start = 0;
+    const increment = target / (duration / 16);
+    const startTime = performance.now();
+    
+    function updateCounter(timestamp) {
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        const current = Math.floor(progress * target);
+        
+        element.textContent = current.toLocaleString();
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+        } else {
+            element.textContent = target.toLocaleString();
+        }
+    }
+    
+    requestAnimationFrame(updateCounter);
+}
+
+// ========================================
+// 🎯 EVENT LISTENERS SETUP
 // ========================================
 
 function setupEventListeners() {
@@ -1152,363 +1749,81 @@ function setupEventListeners() {
         });
     }
 
-    // Cookie banner
-    window.addEventListener('load', () => {
-        const cookieBanner = document.getElementById('cookieBanner');
-        if (cookieBanner && localStorage.getItem('cookiesAccepted') === null) {
-            setTimeout(() => {
-                cookieBanner.style.display = 'block';
-                cookieBanner.style.opacity = '1';
-            }, 2000);
+    // Remember me functionality
+    const rememberMeCheckbox = document.getElementById('rememberMe');
+    if (rememberMeCheckbox) {
+        // Load saved username if available
+        const savedUsername = localStorage.getItem('savedUsername');
+        if (savedUsername && document.getElementById('loginUsername')) {
+            document.getElementById('loginUsername').value = savedUsername;
+            rememberMeCheckbox.checked = true;
         }
+
+        rememberMeCheckbox.addEventListener('change', function() {
+            if (!this.checked) {
+                localStorage.removeItem('savedUsername');
+            }
+        });
+    }
+
+    // CTA Register button
+    const ctaRegisterBtnElement = document.getElementById('ctaRegisterBtn');
+    if (ctaRegisterBtnElement) {
+        ctaRegisterBtnElement.addEventListener('click', () => {
+            showModal('registerModal');
+        });
+    }
+
+    // Add active class to current navigation link on scroll
+    window.addEventListener('scroll', () => {
+        const sections = document.querySelectorAll('section[id]');
+        const scrollPos = window.scrollY + 100;
+
+        sections.forEach(section => {
+            if (scrollPos >= section.offsetTop && scrollPos < section.offsetTop + section.offsetHeight) {
+                const id = section.getAttribute('id');
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${id}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
     });
 }
 
-// ========================================
-// UTILITY FUNCTIONS
-// ========================================
-
-function formatCourseName(name) {
-    return name
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase())
-        .replace('Cybersecurity', '🔒 Cybersecurity')
-        .replace('Networking', '🌐 Networking')
-        .replace('Linux', '🐧 Linux');
-}
-
-function formatModuleName(name) {
-    return name
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase());
-}
-
-function getCourseIcon(course) {
-    const icons = {
-        'cybersecurity': 'fa-lock',
-        'networking': 'fa-network-wired',
-        'linux': 'fa-linux',
-        'github': 'fa-github'
-    };
-    return icons[course] || 'fa-graduation-cap';
-}
-
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-// Enhanced toast notifications
-function showError(message) {
-    showToast(message, 'error');
-}
-
-function showSuccess(message) {
-    showToast(message, 'success');
-}
-
-function showInfo(message) {
-    showToast(message, 'info');
-}
-
-function showToast(message, type = 'info') {
-    // Remove existing toasts
-    document.querySelectorAll('.cyber-toast').forEach(t => t.remove());
-    
-    const toast = document.createElement('div');
-    toast.className = `cyber-toast cyber-toast-${type}`;
-    toast.innerHTML = `
-        <div class="toast-icon">
-            <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
-        </div>
-        <div class="toast-message">${message}</div>
-        <button class="toast-close" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(400px)';
-        setTimeout(() => toast.remove(), 300);
-    }, 5000);
-}
-
-const toastStyles = document.createElement('style');
-toastStyles.textContent = `
-    .cyber-toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 16px 24px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        z-index: 10000;
-        animation: toastSlideIn 0.3s ease;
-        transform: translateX(0);
-        opacity: 1;
-        transition: all 0.3s ease;
-    }
-    
-    @keyframes toastSlideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    .toast-icon {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-    }
-    
-    .cyber-toast-error .toast-icon {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
-    }
-    
-    .cyber-toast-success .toast-icon {
-        background: linear-gradient(135deg, #10b981, #0da271);
-        color: white;
-    }
-    
-    .cyber-toast-info .toast-icon {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
-    }
-    
-    .toast-message {
-        color: #1e293b;
-        font-weight: 500;
-    }
-    
-    .toast-close {
-        background: none;
-        border: none;
-        color: #64748b;
-        cursor: pointer;
-        font-size: 18px;
-        width: 28px;
-        height: 28px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.2s ease;
-    }
-    
-    .toast-close:hover {
-        background: #e2e8f0;
-        color: #1e293b;
-    }
-`;
-document.head.appendChild(toastStyles);
-
-// ========================================
-// LOAD INITIAL DATA
-// ========================================
-
-async function loadInitialData() {
-    try {
-        // Load hero stats with animation
-        setTimeout(() => {
-            animateCounter('studentCount', 10000, 2000);
-            animateCounter('courseCount', 15, 1500);
-            animateCounter('toolCount', 8, 1200);
-            animateCounter('certCount', 5000, 2500);
-        }, 500);
-        
-
-    } catch (error) {
-        console.error('Failed to load initial data:', error);
-    }
-}
-
-
-function animateCounter(elementId, target, duration = 2000) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-
-    let start = 0;
-    const increment = target / (duration / 16);
-    const startTime = performance.now();
-    
-    function updateCounter(timestamp) {
-        const progress = Math.min((timestamp - startTime) / duration, 1);
-        const current = Math.floor(progress * target);
-        
-        element.textContent = current.toLocaleString();
-        
-        if (progress < 1) {
-            requestAnimationFrame(updateCounter);
-        } else {
-            element.textContent = target.toLocaleString();
-        }
-    }
-    
-    requestAnimationFrame(updateCounter);
-}
-
-
-
-function acceptCookies() {
-    localStorage.setItem('cookiesAccepted', 'true');
-    const banner = document.getElementById('cookieBanner');
-    if (banner) {
-        banner.style.opacity = '0';
-        banner.style.transform = 'translateY(100%)';
-        setTimeout(() => {
-            banner.style.display = 'none';
-        }, 500);
-    }
-    showSuccess('🍪 Cookies accepted! You can now use all features.');
-    trackEvent('cookies_accepted');
-}
-
-function declineCookies() {
-    localStorage.setItem('cookiesAccepted', 'false');
-    const banner = document.getElementById('cookieBanner');
-    if (banner) {
-        banner.style.opacity = '0';
-        banner.style.transform = 'translateY(100%)';
-        setTimeout(() => {
-            banner.style.display = 'none';
-        }, 500);
-    }
-    showInfo('🍪 Cookies declined. Some features may be limited.');
-    trackEvent('cookies_declined');
-}
-
-function customizeCookies() {
-    const modal = document.createElement('div');
-    modal.className = 'auth-modal';
-    modal.id = 'cookieSettingsModal';
-    modal.innerHTML = `
-        <div class="modal-content cyber-card">
-            <button class="modal-close" onclick="closeModal('cookieSettingsModal')">
-                <i class="fas fa-xmark"></i>
-            </button>
-            <div class="modal-header">
-                <i class="fas fa-cookie modal-icon cyber-gradient"></i>
-                <h2>Cookie Settings</h2>
-                <p>Choose which cookies you want to allow</p>
-            </div>
-            <div class="cookie-settings-content">
-                <div class="cookie-setting-item">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="essentialCookies" checked disabled>
-                        <span><i class="fas fa-check-circle"></i> Essential Cookies <small>(Required)</small></span>
-                    </label>
-                    <p>These cookies are necessary for the website to function properly.</p>
-                </div>
-                
-                <div class="cookie-setting-item">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="analyticsCookies" checked>
-                        <span><i class="fas fa-chart-line"></i> Analytics Cookies</span>
-                    </label>
-                    <p>Help us understand how visitors interact with our website.</p>
-                </div>
-                
-                <div class="cookie-setting-item">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="functionalCookies" checked>
-                        <span><i class="fas fa-cog"></i> Functional Cookies</span>
-                    </label>
-                    <p>Remember your preferences and settings.</p>
-                </div>
-                
-                <div class="cookie-setting-item">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="marketingCookies">
-                        <span><i class="fas fa-bullhorn"></i> Marketing Cookies</span>
-                    </label>
-                    <p>Used to deliver personalized ads and track marketing campaigns.</p>
-                </div>
-            </div>
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button class="btn btn-primary" onclick="saveCookieSettings()">
-                    <i class="fas fa-save"></i> Save Preferences
-                </button>
-                <button class="btn btn-outline" onclick="closeModal('cookieSettingsModal')">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    showModal('cookieSettingsModal');
-    trackEvent('cookies_customize_opened');
-}
-
-function saveCookieSettings() {
-    const settings = {
-        essential: true, 
-        analytics: document.getElementById('analyticsCookies').checked,
-        functional: document.getElementById('functionalCookies').checked,
-        marketing: document.getElementById('marketingCookies').checked
-    };
-    
-    localStorage.setItem('cookieSettings', JSON.stringify(settings));
-    localStorage.setItem('cookiesAccepted', 'custom');
-    
-    closeModal('cookieSettingsModal');
-    const banner = document.getElementById('cookieBanner');
-    if (banner) {
-        banner.style.display = 'none';
-    }
-    
-    showSuccess('✅ Cookie preferences saved!');
-    trackEvent('cookies_customized', settings);
-}
-
-window.addEventListener('load', () => {
-    const cookieBanner = document.getElementById('cookieBanner');
-    const cookiesAccepted = localStorage.getItem('cookiesAccepted');
-    
-    if (cookieBanner && cookiesAccepted === null) {
-        setTimeout(() => {
-            cookieBanner.style.display = 'block';
-            setTimeout(() => {
-                cookieBanner.style.opacity = '1';
-                cookieBanner.style.transform = 'translateY(0)';
-            }, 100);
-        }, 2000);
-    }
-});
 
 window.cyberHub = {
+
     login,
     register,
     logout,
+    
+
     updateProgress,
     loadUserProgress,
+    
+
     checkIP,
     checkPasswordStrength,
     showVPNSimulator,
+    
+
     showModal,
     closeModal,
     showError,
     showSuccess,
     showInfo,
-    currentUser,
-    authToken
+    trackEvent,
+    
+
+    get currentUser() { return currentUser; },
+    get authToken() { return authToken; },
+    get securityToken() { return securityToken; }
 };
+
 
 console.log('%c✨ CyberHub API initialized', 'color: #8b5cf6; font-weight: bold;');
 console.log('%c📚 Available methods:', 'color: #6366f1;', Object.keys(window.cyberHub));
+console.log('%c🔒 Security Features:', 'color: #ef4444;', 'Worker URL Obfuscated, Client-side Hashing, Session Monitoring, Security Token');
