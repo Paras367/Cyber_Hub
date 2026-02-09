@@ -2,8 +2,7 @@
 // CYBER LEARNING HUB 
 // ========================================
 
-
-
+// Layer 1 : Base 64
 const ENCRYPTED_PARTS = {
     p1: 'aHR0cHM6Ly9jeWJlci1odWI=',
     p2: 'uZGhpbWFucGFyYXM2MDU=',
@@ -11,10 +10,10 @@ const ENCRYPTED_PARTS = {
     p4: 'uZGV2'
 };
 
-
+// Layer 2: XOR encryption key (rotating)
 const XOR_KEY = [42, 87, 15, 93, 28, 61, 34, 79];
 
-
+// Layer 3: Character substitution map
 const SUB_MAP = {
     'a': 'z', 'b': 'y', 'c': 'x', 'd': 'w', 'e': 'v',
     'f': 'u', 'g': 't', 'h': 's', 'i': 'r', 'j': 'q',
@@ -23,23 +22,23 @@ const SUB_MAP = {
     'u': 'f', 'v': 'e', 'w': 'd', 'x': 'c', 'y': 'b', 'z': 'a'
 };
 
-
+// Decrypt worker URL function
 function decryptWorkerURL() {
     try {
-    
+        // Step 1: Decode base64 parts
         let decoded = '';
         for (let i = 1; i <= 4; i++) {
             decoded += atob(ENCRYPTED_PARTS[`p${i}`]);
         }
         
-     
+        // Step 2: Apply XOR decryption
         let xorDecrypted = '';
         for (let i = 0; i < decoded.length; i++) {
             const keyIndex = i % XOR_KEY.length;
             xorDecrypted += String.fromCharCode(decoded.charCodeAt(i) ^ XOR_KEY[keyIndex]);
         }
         
-
+        // Step 3: Apply character substitution
         let finalURL = '';
         for (const char of xorDecrypted) {
             if (char.toLowerCase() in SUB_MAP) {
@@ -50,7 +49,7 @@ function decryptWorkerURL() {
             }
         }
         
-
+        // Validate URL format
         if (!finalURL.startsWith('http')) {
             console.error('🔐 URL decryption failed - using fallback');
             return 'https://cyber-hub.dhimanparas605.workers.dev';
@@ -64,15 +63,19 @@ function decryptWorkerURL() {
     }
 }
 
-
+// Initialize API base URL
 const API_BASE = decryptWorkerURL();
 console.log('%c🔒 API Endpoint:', 'color: #8b5cf6; font-weight: bold;', API_BASE);
 
+// ========================================
+// ⚙️ CONFIGURATION & GLOBAL STATE
+// ========================================
 
-
-const API_TIMEOUT = 15000; 
+const API_TIMEOUT = 15000; // 15 seconds timeout
 const MAX_RETRY_ATTEMPTS = 3;
-const SESSION_TIMEOUT = 30 * 60 * 1000; 
+const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+// Global state
 let authToken = localStorage.getItem('authToken') || null;
 let currentUser = null;
 let lastActivity = Date.now();
@@ -80,7 +83,7 @@ let apiQueue = [];
 let isProcessingQueue = false;
 let securityToken = generateSecurityToken();
 
-
+// Security token generator
 function generateSecurityToken() {
     return Array.from(crypto.getRandomValues(new Uint8Array(16)))
         .map(b => b.toString(16).padStart(2, '0'))
@@ -143,7 +146,6 @@ function setupSecurityMonitoring() {
 }
 
 function logSecurityEvent(eventType) {
-    // In production, send to security monitoring service
     console.log(`🛡️ Security Event: ${eventType} at ${new Date().toISOString()}`);
 }
 
@@ -217,15 +219,14 @@ async function login() {
     showLoading(true, 'Authenticating...');
 
     try {
-        // Hash password client-side before sending (additional security layer)
-        const hashedPassword = await hashPassword(password);
-        
+        // FIXED: Send plain password (Worker handles hashing)
+        // Client-side hashing was causing double-hashing issues
         const response = await apiRequest(`${API_BASE}/api/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 username, 
-                password: hashedPassword,
+                password, // Plain password - Worker will hash it
                 securityToken
             })
         });
@@ -255,7 +256,7 @@ async function login() {
             // Track login event
             trackEvent('user_login', { username: currentUser.username });
         } else {
-            showError(response.error || 'Invalid credentials. Please try again.');
+            showError(response.data?.error || 'Invalid credentials. Please try again.');
         }
     } catch (error) {
         if (error.message.includes('timeout')) {
@@ -311,16 +312,14 @@ async function register() {
     showLoading(true, 'Creating your account...');
 
     try {
-        // Hash password client-side
-        const hashedPassword = await hashPassword(password);
-        
+        // FIXED: Send plain password (Worker handles hashing)
         const response = await apiRequest(`${API_BASE}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 username, 
                 email, 
-                password: hashedPassword,
+                password, // Plain password - Worker will hash it
                 securityToken
             })
         });
@@ -338,7 +337,7 @@ async function register() {
             
             trackEvent('user_register', { username, email });
         } else {
-            showError(response.error || 'Registration failed. Username might already exist.');
+            showError(response.data?.error || 'Registration failed. Username might already exist.');
         }
     } catch (error) {
         if (error.message.includes('timeout')) {
@@ -869,15 +868,6 @@ function showVPNSimulator() {
 // 🔒 SECURITY UTILITIES
 // ========================================
 
-// Client-side password hashing (additional security layer)
-async function hashPassword(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password + securityToken);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
 // Password strength checker (client-side)
 function getPasswordStrength(password) {
     let score = 0;
@@ -920,7 +910,7 @@ function getPasswordStrength(password) {
 }
 
 // ========================================
-// 🌐 API REQUEST HANDLER WITH SECURITY
+// 🌐 API REQUEST HANDLER WITH SECURITY - FIXED
 // ========================================
 
 async function apiRequest(url, options = {}) {
@@ -947,16 +937,24 @@ async function apiRequest(url, options = {}) {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
+            // Try to parse error response
+            let errorData = {};
+            try {
+                errorData = await response.json();
+            } catch (e) {
+                // If JSON parsing fails, use default error
+                errorData = { error: `HTTP error! status: ${response.status}` };
+            }
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
 
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            return await response.json();
-        } else {
-            return { success: true,  await response.text() };
-        }
+        // FIXED: Always parse JSON response (Worker always returns JSON)
+        const data = await response.json();
+        return {
+            success: true,
+            data,
+            status: response.status
+        };
     } catch (error) {
         if (error.name === 'AbortError') {
             throw new Error('Request timeout. Please try again.');
@@ -1407,23 +1405,7 @@ window.addEventListener('load', () => {
 // ========================================
 
 function trackEvent(eventName, data = {}) {
-    // In production, send to analytics service
     console.log(`📊 Event tracked: ${eventName}`, data);
-    
-    // Example: Send to backend for analytics (disabled for security)
-    /*
-    fetch(`${API_BASE}/api/analytics`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            event: eventName,
-            data,
-            timestamp: new Date().toISOString(),
-            userId: currentUser?.username || 'anonymous',
-            securityToken
-        })
-    }).catch(console.error);
-    */
 }
 
 // ========================================
@@ -1602,7 +1584,6 @@ async function loadInitialData() {
             animateCounter('certCount', 5000, 2500);
         }, 500);
         
-        // Load any other initial data here
         trackEvent('initial_data_loaded');
     } catch (error) {
         console.error('Failed to load initial data:', error);
@@ -1614,7 +1595,6 @@ async function loadUserData() {
 
     try {
         console.log('👤 Loading user data for:', currentUser?.username);
-        // Additional user data loading can be added here
     } catch (error) {
         console.error('Failed to load user data:', error);
     }
@@ -1774,7 +1754,6 @@ function setupEventListeners() {
         });
     }
 
-    // Add active class to current navigation link on scroll
     window.addEventListener('scroll', () => {
         const sections = document.querySelectorAll('section[id]');
         const scrollPos = window.scrollY + 100;
@@ -1795,35 +1774,26 @@ function setupEventListeners() {
 
 
 window.cyberHub = {
-
     login,
     register,
     logout,
-    
-
     updateProgress,
     loadUserProgress,
-    
-
     checkIP,
     checkPasswordStrength,
     showVPNSimulator,
-    
-
     showModal,
     closeModal,
     showError,
     showSuccess,
     showInfo,
     trackEvent,
-    
-
     get currentUser() { return currentUser; },
     get authToken() { return authToken; },
     get securityToken() { return securityToken; }
 };
 
-
 console.log('%c✨ CyberHub API initialized', 'color: #8b5cf6; font-weight: bold;');
 console.log('%c📚 Available methods:', 'color: #6366f1;', Object.keys(window.cyberHub));
-console.log('%c🔒 Security Features:', 'color: #ef4444;', 'Worker URL Obfuscated, Client-side Hashing, Session Monitoring, Security Token');
+console.log('%c🔒 Security Features:', 'color: #ef4444;', 'Worker URL Obfuscated, Session Monitoring, Security Token');
+console.log('%c✅ Syntax Error Fixed:', 'color: #10b981;', 'API response handling corrected');
