@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Learning Hub - Master IT & Cybersecurity</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">CyberHub</div>
+                <nav class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="courses/cybersecurity.html">Cybersecurity</a>
+                    <a href="courses/networking.html">Networking</a>
+                    <a href="courses/linux.html">Linux</a>
+                </nav>
+                <div class="auth-section">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="registerBtn">Register</button>
+                    <div id="userMenu" style="display: none; align-items: center; gap: 15px;">
+                        <span id="userName" style="font-weight: 600;"></span>
+                        <button class="btn btn-outline" id="logoutBtn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="hero">
+            <h1>Master Cybersecurity & IT Skills</h1>
+            <p>Comprehensive learning platform for cybersecurity, networking, Linux, and more. Learn at your own pace with interactive courses and practical tools.</p>
+            <button class="btn btn-primary" onclick="document.querySelector('.courses').scrollIntoView({behavior: 'smooth'})">Explore Courses</button>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <h3>📚 Interactive Courses</h3>
+                <p>Learn from beginner to advanced levels with hands-on exercises and real-world scenarios.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎯 Progress Tracking</h3>
+                <p>Monitor your learning journey with detailed progress analytics and completion certificates.</p>
+            </div>
+            <div class="feature-card">
+                <h3>🧪 Practical Tools</h3>
+                <p>Access built-in tools like IP checker, password strength tester, and VPN simulators.</p>
+            </div>
+        </section>
+
+        <section class="courses">
+            <h2 class="section-title">Available Courses</h2>
+            <div class="course-grid">
+                <div class="course-card" data-course="cybersecurity">
+                    <h3>🔒 Cybersecurity Fundamentals</h3>
+                    <p>Learn about threats, vulnerabilities, and security best practices.</p>
+                </div>
+                <div class="course-card" data-course="networking">
+                    <h3>🌐 Networking & VPNs</h3>
+                    <p>Understand network protocols, VPN concepts, and secure communications.</p>
+                </div>
+                <div class="course-card" data-course="linux">
+                    <h3>🐧 Linux Administration</h3>
+                    <p>Master Linux commands, system administration, and security hardening.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="tools-section">
+            <h2 class="section-title">Learning Tools</h2>
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h3>IP Address Checker</h3>
+                    <button class="btn btn-primary" onclick="checkIP()">Check My IP</button>
+                    <div id="ipResult"></div>
+                </div>
+                <div class="tool-card">
+                    <h3>Password Strength Tester</h3>
+                    <input type="password" id="passwordInput" placeholder="Enter password" oninput="checkPasswordStrength()">
+                    <div id="passwordResult"></div>
+                </div>
+                <div class="tool-card">
+                    <h3>VPN Concept Simulator</h3>
+                    <button class="btn btn-primary" onclick="showVPNSimulator()">Visualize VPN</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="user-dashboard" id="userDashboard">
+            <h3>Your Learning Progress</h3>
+            <div id="progressContent"></div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="auth-modal" id="loginModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">Login</h2>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <button class="btn btn-primary" onclick="login()" style="width: 100%;">Login</button>
+            <button class="btn btn-outline" onclick="closeModal('loginModal')" style="width: 100%; margin-top: 10px;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="auth-modal" id="registerModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">Register</h2>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="registerUsername" placeholder="Choose username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="registerEmail" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="registerPassword" placeholder="Choose password">
+            </div>
+            <button class="btn btn-primary" onclick="register()" style="width: 100%;">Register</button>
+            <button class="btn btn-outline" onclick="closeModal('registerModal')" style="width: 100%; margin-top: 10px;">Cancel</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Cyber Learning Hub. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
