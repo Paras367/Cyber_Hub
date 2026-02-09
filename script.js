@@ -1,104 +1,31 @@
 // ========================================
-// CYBER LEARNING HUB 
+// CYBERHUB - ENHANCED JAVASCRIPT
+// Backend: https://cyber-hub.dhimanparas605.workers.dev
 // ========================================
 
-// Layer 1 : Base 64
-const ENCRYPTED_PARTS = {
-    p1: 'aHR0cHM6Ly9jeWJlci1odWI=',
-    p2: 'ZGhpbWFucGFyYXM2MDU=',
-    p3: 'LndvcmtlcnM=',
-    p4: 'ZGV2'
-};
+const API_BASE = 'https://cyber-hub.dhimanparas605.workers.dev';
+const API_TIMEOUT = 15000;
 
-// Layer 2: XOR encryption key (rotating)
-const XOR_KEY = [42, 87, 15, 93, 28, 61, 34, 79];
 
-// Layer 3: Character substitution map
-const SUB_MAP = {
-    'a': 'z', 'b': 'y', 'c': 'x', 'd': 'w', 'e': 'v',
-    'f': 'u', 'g': 't', 'h': 's', 'i': 'r', 'j': 'q',
-    'k': 'p', 'l': 'o', 'm': 'n', 'n': 'm', 'o': 'l',
-    'p': 'k', 'q': 'j', 'r': 'i', 's': 'h', 't': 'g',
-    'u': 'f', 'v': 'e', 'w': 'd', 'x': 'c', 'y': 'b', 'z': 'a'
-};
-
-// Decrypt worker URL function
-function decryptWorkerURL() {
-    try {
-        // Step 1: Decode base64 parts
-        let decoded = '';
-        for (let i = 1; i <= 4; i++) {
-            decoded += atob(ENCRYPTED_PARTS[`p${i}`]);
-        }
-        
-        // Step 2: Apply XOR decryption
-        let xorDecrypted = '';
-        for (let i = 0; i < decoded.length; i++) {
-            const keyIndex = i % XOR_KEY.length;
-            xorDecrypted += String.fromCharCode(decoded.charCodeAt(i) ^ XOR_KEY[keyIndex]);
-        }
-        
-        // Step 3: Apply character substitution
-        let finalURL = '';
-        for (const char of xorDecrypted) {
-            if (char.toLowerCase() in SUB_MAP) {
-                finalURL += SUB_MAP[char.toLowerCase()] === char.toLowerCase() ? 
-                    SUB_MAP[char].toUpperCase() : SUB_MAP[char.toLowerCase()];
-            } else {
-                finalURL += char;
-            }
-        }
-        
-        // Validate URL format
-        if (!finalURL.startsWith('http')) {
-            console.error('🔐 URL decryption failed - using fallback');
-            return 'https://cyber-hub.dhimanparas605.workers.dev';
-        }
-        
-        console.log('✅ Worker URL decrypted successfully');
-        return finalURL;
-    } catch (error) {
-        console.error('🔐 Decryption error:', error);
-        return 'https://cyber-hub.dhimanparas605.workers.dev';
-    }
-}
-
-// Initialize API base URL
-const API_BASE = decryptWorkerURL();
-console.log('%c🔒 API Endpoint:', 'color: #8b5cf6; font-weight: bold;', API_BASE);
-
-// ========================================
-// ⚙️ CONFIGURATION & GLOBAL STATE
-// ========================================
-
-const API_TIMEOUT = 15000; // 15 seconds timeout
-const MAX_RETRY_ATTEMPTS = 3;
-const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-
-// Global state
 let authToken = localStorage.getItem('authToken') || null;
 let currentUser = null;
 let lastActivity = Date.now();
-let apiQueue = [];
-let isProcessingQueue = false;
-let securityToken = generateSecurityToken();
-
-// Security token generator
-function generateSecurityToken() {
-    return Array.from(crypto.getRandomValues(new Uint8Array(16)))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
-}
+const SESSION_TIMEOUT = 30 * 60 * 1000; 
 
 // ========================================
-// 🚀 INITIALIZATION
+// INITIALIZATION
 // ========================================
 
-document.addEventListener('DOMContentLoaded', initializeCyberHub);
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApp();
+});
 
-async function initializeCyberHub() {
-    // Initialize security monitoring
-    setupSecurityMonitoring();
+async function initializeApp() {
+    // Initialize matrix background
+    initMatrixBackground();
+    
+    // Initialize custom cursor
+    initCustomCursor();
     
     // Setup preloader
     setupPreloader();
@@ -109,64 +36,209 @@ async function initializeCyberHub() {
     // Setup event listeners
     setupEventListeners();
     
-    // Initialize page components
-    initializePageComponents();
-    
-    // Setup cyber animations
-    initializeCyberAnimations();
-    
-    // Load initial data
-    await loadInitialData();
+    // Initialize animations
+    initAnimations();
     
     // Start session monitoring
     startSessionMonitoring();
     
-    // Log initialization
-    console.log('%c🚀 Cyber Learning Hub initialized successfully!', 'color: #6366f1; font-weight: bold; font-size: 16px;');
-    console.log('%c👤 User Status:', 'color: #10b981;', authToken ? 'Authenticated' : 'Not Logged In');
-    console.log('%c🛡️ Security Token:', 'color: #8b5cf6;', securityToken.substring(0, 8) + '...');
-}
-
-// Security monitoring setup
-function setupSecurityMonitoring() {
-    // Monitor for suspicious activities
-    document.addEventListener('copy', logSecurityEvent.bind(null, 'copy_attempt'));
-    document.addEventListener('cut', logSecurityEvent.bind(null, 'cut_attempt'));
-    document.addEventListener('paste', logSecurityEvent.bind(null, 'paste_attempt'));
-    document.addEventListener('contextmenu', logSecurityEvent.bind(null, 'right_click'));
+    // Initialize terminal demo
+    initTerminalDemo();
     
-    // Monitor console usage
-    if (typeof console !== 'undefined') {
-        const originalLog = console.log;
-        console.log = function() {
-            logSecurityEvent('console_access');
-            originalLog.apply(console, arguments);
-        };
-    }
-}
-
-function logSecurityEvent(eventType) {
-    console.log(`🛡️ Security Event: ${eventType} at ${new Date().toISOString()}`);
-}
-
-// Session monitoring
-function startSessionMonitoring() {
-    setInterval(() => {
-        if (authToken && Date.now() - lastActivity > SESSION_TIMEOUT) {
-            console.log('⏰ Session timeout - logging out');
-            logout();
-            showInfo('Session expired due to inactivity. Please login again.');
-        }
-    }, 60000); // Check every minute
-    
-    // Update last activity on user interaction
-    document.addEventListener('mousemove', () => { lastActivity = Date.now(); });
-    document.addEventListener('keypress', () => { lastActivity = Date.now(); });
-    document.addEventListener('click', () => { lastActivity = Date.now(); });
+    console.log('%c🚀 CyberHub Initialized', 'color: #00f3ff; font-size: 16px; font-weight: bold;');
 }
 
 // ========================================
-// 🔐 AUTHENTICATION SYSTEM
+// MATRIX BACKGROUND
+// ========================================
+
+function initMatrixBackground() {
+    const canvas = document.getElementById('matrixCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+    
+    for (let x = 0; x < columns; x++) {
+        drops[x] = 1;
+    }
+    
+    function draw() {
+        ctx.fillStyle = 'rgba(10, 14, 39, 0.04)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#00f3ff';
+        ctx.font = fontSize + 'px JetBrains Mono';
+        
+        for (let i = 0; i < drops.length; i++) {
+            const text = matrix.charAt(Math.floor(Math.random() * matrix.length));
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            
+            drops[i]++;
+        }
+    }
+    
+    setInterval(draw, 35);
+    
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+}
+
+// ========================================
+// CUSTOM CURSOR
+// ========================================
+
+function initCustomCursor() {
+    const cursor = document.getElementById('cursor');
+    if (!cursor) return;
+    
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+    });
+    
+    document.addEventListener('mousedown', () => {
+        cursor.style.transform = 'scale(0.8)';
+    });
+    
+    document.addEventListener('mouseup', () => {
+        cursor.style.transform = 'scale(1)';
+    });
+}
+
+// ========================================
+// PRELOADER
+// ========================================
+
+function setupPreloader() {
+    const preloader = document.getElementById('preloader');
+    const loadProgress = document.getElementById('loadProgress');
+    let progress = 0;
+    
+    const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            setTimeout(() => {
+                preloader.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 500);
+        }
+        if (loadProgress) {
+            loadProgress.textContent = Math.floor(progress);
+        }
+    }, 100);
+}
+
+// ========================================
+// TERMINAL DEMO
+// ========================================
+
+function initTerminalDemo() {
+    const output = document.getElementById('terminalOutput');
+    if (!output) return;
+    
+    const commands = [
+        { text: '$ initializing security scan...', delay: 500 },
+        { text: '$ checking system vulnerabilities...', delay: 1000 },
+        { text: '$ running port scanner on target 192.168.1.1', delay: 1500 },
+        { text: '[+] Found 3 open ports: 22, 80, 443', delay: 2000 },
+        { text: '$ analyzing web application security...', delay: 2500 },
+        { text: '[+] Detected SQL injection vulnerability', delay: 3000 },
+        { text: '[+] Detected XSS vulnerability', delay: 3500 },
+        { text: '$ exploiting vulnerability...', delay: 4000 },
+        { text: '[SUCCESS] Root access obtained!', delay: 4500 }
+    ];
+    
+    let index = 0;
+    
+    function typeCommand() {
+        if (index < commands.length) {
+            setTimeout(() => {
+                const line = document.createElement('div');
+                line.textContent = commands[index].text;
+                line.style.color = commands[index].text.includes('[SUCCESS]') ? '#39ff14' : 
+                                 commands[index].text.includes('[+]') ? '#00f3ff' : 
+                                 '#b4bcd0';
+                output.appendChild(line);
+                output.scrollTop = output.scrollHeight;
+                index++;
+                typeCommand();
+            }, commands[index].delay - (index > 0 ? commands[index - 1].delay : 0));
+        } else {
+            // Reset and repeat
+            setTimeout(() => {
+                output.innerHTML = '';
+                index = 0;
+                typeCommand();
+            }, 3000);
+        }
+    }
+    
+    typeCommand();
+}
+
+// ========================================
+// COUNTERS
+// ========================================
+
+function initAnimations() {
+    // Animate counters
+    const counters = document.querySelectorAll('.counter');
+    
+    const observerOptions = {
+        threshold: 0.5
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target;
+                const target = parseInt(counter.dataset.target);
+                animateCounter(counter, target);
+                observer.unobserve(counter);
+            }
+        });
+    }, observerOptions);
+    
+    counters.forEach(counter => observer.observe(counter));
+}
+
+function animateCounter(element, target, duration = 2000) {
+    let start = 0;
+    const increment = target / (duration / 16);
+    const startTime = performance.now();
+    
+    function update(timestamp) {
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        const current = Math.floor(progress * target);
+        element.textContent = current.toLocaleString();
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        } else {
+            element.textContent = target.toLocaleString();
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+// ========================================
+// AUTHENTICATION
 // ========================================
 
 async function checkAuthStatus() {
@@ -184,13 +256,14 @@ async function verifyToken() {
         });
 
         if (response.success && response.data.progress) {
+            currentUser = { username: response.data.username };
             updateAuthUI(true);
             await loadProgress(response.data.progress);
         } else {
             logout();
         }
     } catch (error) {
-        console.error('🔐 Token verification failed:', error);
+        console.error('Token verification failed:', error);
         logout();
     }
 }
@@ -198,37 +271,29 @@ async function verifyToken() {
 async function login() {
     const username = document.getElementById('loginUsername')?.value?.trim();
     const password = document.getElementById('loginPassword')?.value;
-    const rememberMe = document.getElementById('rememberMe')?.checked;
 
-    // Validation
     if (!username || !password) {
-        showError('Please fill in all fields');
+        showToast('Please fill in all fields', 'error');
         return;
     }
 
-    if (username.length < 3 || username.length > 30) {
-        showError('Username must be 3-30 characters');
+    if (username.length < 3) {
+        showToast('Username must be at least 3 characters', 'error');
         return;
     }
 
     if (password.length < 8) {
-        showError('Password must be at least 8 characters long');
+        showToast('Password must be at least 8 characters', 'error');
         return;
     }
 
-    showLoading(true, 'Authenticating...');
+    showLoading(true);
 
     try {
-        // FIXED: Send plain password (Worker handles hashing)
-        // Client-side hashing was causing double-hashing issues
         const response = await apiRequest(`${API_BASE}/api/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                username, 
-                password, // Plain password - Worker will hash it
-                securityToken
-            })
+            body: JSON.stringify({ username, password })
         });
 
         if (response.success) {
@@ -236,35 +301,17 @@ async function login() {
             localStorage.setItem('authToken', authToken);
             currentUser = response.data.user;
             
-            // Save username if remember me is checked
-            if (rememberMe) {
-                localStorage.setItem('savedUsername', username);
-            } else {
-                localStorage.removeItem('savedUsername');
-            }
-
             closeModal('loginModal');
             updateAuthUI(true);
-            showSuccess(`🎉 Welcome back, ${currentUser.username}!`);
+            showToast(`Welcome back, ${currentUser.username}!`, 'success');
             
-            // Reload user data
-            await Promise.all([
-                loadUserProgress(),
-                loadUserData()
-            ]);
-            
-            // Track login event
-            trackEvent('user_login', { username: currentUser.username });
+            await loadUserProgress();
         } else {
-            showError(response.data?.error || 'Invalid credentials. Please try again.');
+            showToast(response.data?.error || 'Invalid credentials', 'error');
         }
     } catch (error) {
-        if (error.message.includes('timeout')) {
-            showError('Login timeout. Please check your connection and try again.');
-        } else {
-            showError('Login failed. Please check your credentials.');
-        }
-        console.error('🔐 Login error:', error);
+        showToast('Login failed. Please try again.', 'error');
+        console.error('Login error:', error);
     } finally {
         showLoading(false);
     }
@@ -276,56 +323,42 @@ async function register() {
     const password = document.getElementById('registerPassword')?.value;
     const confirmPassword = document.getElementById('confirmPassword')?.value;
 
-    // Validation
-    if (!username || !email || !password) {
-        showError('Please fill in all fields');
+    if (!username || !email || !password || !confirmPassword) {
+        showToast('Please fill in all fields', 'error');
         return;
     }
 
     if (username.length < 3 || username.length > 30) {
-        showError('Username must be 3-30 characters');
+        showToast('Username must be 3-30 characters', 'error');
         return;
     }
 
     if (!validateEmail(email)) {
-        showError('Please enter a valid email address');
+        showToast('Please enter a valid email address', 'error');
         return;
     }
 
     if (password !== confirmPassword) {
-        showError('Passwords do not match!');
+        showToast('Passwords do not match', 'error');
         return;
     }
 
     if (password.length < 8) {
-        showError('Password must be at least 8 characters long');
+        showToast('Password must be at least 8 characters', 'error');
         return;
     }
 
-    // Password strength check
-    const strength = getPasswordStrength(password);
-    if (strength.score < 60) {
-        showError(`Password strength: ${strength.level}. Please create a stronger password.`);
-        return;
-    }
-
-    showLoading(true, 'Creating your account...');
+    showLoading(true);
 
     try {
-        // FIXED: Send plain password (Worker handles hashing)
         const response = await apiRequest(`${API_BASE}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                username, 
-                email, 
-                password, // Plain password - Worker will hash it
-                securityToken
-            })
+            body: JSON.stringify({ username, email, password })
         });
 
         if (response.success) {
-            showSuccess('✅ Account created successfully! Please login to continue.');
+            showToast('Account created successfully!', 'success');
             closeModal('registerModal');
             
             // Auto-fill login form
@@ -334,36 +367,24 @@ async function register() {
                 document.getElementById('loginPassword').value = password;
                 showModal('loginModal');
             }
-            
-            trackEvent('user_register', { username, email });
         } else {
-            showError(response.data?.error || 'Registration failed. Username might already exist.');
+            showToast(response.data?.error || 'Registration failed', 'error');
         }
     } catch (error) {
-        if (error.message.includes('timeout')) {
-            showError('Registration timeout. Please try again.');
-        } else {
-            showError('Registration failed. Please try again later.');
-        }
-        console.error('🔐 Registration error:', error);
+        showToast('Registration failed. Please try again.', 'error');
+        console.error('Registration error:', error);
     } finally {
         showLoading(false);
     }
 }
 
 function logout() {
-    // Clear all sensitive data
     localStorage.removeItem('authToken');
-    localStorage.removeItem('savedUsername');
     sessionStorage.clear();
-    
     authToken = null;
     currentUser = null;
-    securityToken = generateSecurityToken();
-    
     updateAuthUI(false);
-    showSuccess('👋 You have been logged out successfully');
-    trackEvent('user_logout');
+    showToast('Logged out successfully', 'success');
 }
 
 function updateAuthUI(isLoggedIn) {
@@ -374,30 +395,21 @@ function updateAuthUI(isLoggedIn) {
     const userDashboard = document.getElementById('userDashboard');
 
     if (isLoggedIn && currentUser) {
-        // Show user menu
         if (userMenu) userMenu.style.display = 'flex';
         if (loginBtn) loginBtn.style.display = 'none';
         if (registerBtn) registerBtn.style.display = 'none';
         if (userName) userName.textContent = currentUser.username;
         if (userDashboard) userDashboard.style.display = 'block';
-        
-        // Add cyber glow effect
-        const userInfo = document.querySelector('.user-info');
-        if (userInfo) userInfo.classList.add('cyber-glow');
     } else {
-        // Show auth buttons
         if (userMenu) userMenu.style.display = 'none';
         if (loginBtn) loginBtn.style.display = 'block';
         if (registerBtn) registerBtn.style.display = 'block';
         if (userDashboard) userDashboard.style.display = 'none';
-        
-        const userInfo = document.querySelector('.user-info');
-        if (userInfo) userInfo.classList.remove('cyber-glow');
     }
 }
 
 // ========================================
-// 📊 PROGRESS TRACKING SYSTEM
+// PROGRESS TRACKING
 // ========================================
 
 async function loadUserProgress() {
@@ -412,7 +424,7 @@ async function loadUserProgress() {
             await loadProgress(response.data.progress);
         }
     } catch (error) {
-        console.error('📊 Failed to load progress:', error);
+        console.error('Failed to load progress:', error);
     }
 }
 
@@ -422,235 +434,83 @@ async function loadProgress(progress) {
 
     if (!progress || Object.keys(progress).length === 0) {
         contentDiv.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-clipboard-list fa-3x" style="color: #6366f1; margin-bottom: 20px;"></i>
-                <h4>No progress yet</h4>
-                <p>Start learning and track your progress here!</p>
-                <button class="btn btn-primary" onclick="document.querySelector('#courses').scrollIntoView({behavior: 'smooth'})">
-                    <i class="fas fa-graduation-cap"></i> Browse Courses
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-clipboard-list" style="font-size: 64px; color: #00f3ff; margin-bottom: 20px;"></i>
+                <h3 style="color: #00f3ff; margin-bottom: 10px;">No Progress Yet</h3>
+                <p style="color: #b4bcd0;">Start learning and track your progress here!</p>
+                <button class="btn btn-primary" onclick="scrollToSection('courses')" style="margin-top: 20px;">
+                    <i class="fas fa-graduation-cap"></i> BROWSE COURSES
                 </button>
             </div>
         `;
         return;
     }
 
-    let html = `
-        <div class="progress-grid">
-            ${Object.entries(progress).map(([course, modules]) => {
-                const completedCount = Object.values(modules).filter(v => v).length;
-                const totalCount = Object.keys(modules).length;
-                const percentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-                const courseIcon = getCourseIcon(course);
-                
-                return `
-                    <div class="progress-card cyber-card">
-                        <div class="progress-header">
-                            <div class="progress-icon cyber-gradient">
-                                <i class="fas ${courseIcon}"></i>
-                            </div>
-                            <div class="progress-info">
-                                <h4>${formatCourseName(course)}</h4>
-                                <div class="progress-stats">
-                                    <span><i class="fas fa-check-circle"></i> ${completedCount} completed</span>
-                                    <span><i class="fas fa-tasks"></i> ${totalCount} total</span>
-                                </div>
-                            </div>
+    // Display progress (simplified for now)
+    contentDiv.innerHTML = `
+        <div style="padding: 20px;">
+            <p style="color: #00f3ff;">Progress loaded successfully!</p>
+        </div>
+    `;
+}
+
+// ========================================
+// TOOLS
+// ========================================
+
+async function checkIP() {
+    showLoading(true);
+
+    try {
+        const response = await apiRequest(`${API_BASE}/api/tools/ip`);
+        
+        if (response.success) {
+            const ipInfo = response.data.ipInfo;
+            const resultDiv = document.getElementById('ipResult');
+            
+            if (resultDiv) {
+                resultDiv.innerHTML = `
+                    <div style="padding: 15px;">
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #00f3ff;">IP Address:</strong> 
+                            <span style="color: #39ff14;">${ipInfo.ip || 'Unknown'}</span>
                         </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${percentage}%">
-                                    <span class="progress-percentage">${Math.round(percentage)}%</span>
-                                </div>
-                            </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #00f3ff;">Location:</strong> 
+                            <span>${ipInfo.city || 'Unknown'}, ${ipInfo.region || 'Unknown'}, ${ipInfo.country || 'Unknown'}</span>
                         </div>
-                        <div class="progress-modules">
-                            ${Object.entries(modules).map(([module, completed]) => `
-                                <div class="module-item ${completed ? 'completed' : ''}">
-                                    <i class="fas ${completed ? 'fa-check-circle' : 'fa-circle'}"></i>
-                                    <span>${formatModuleName(module)}</span>
-                                    ${completed ? '<span class="module-badge">✓ Completed</span>' : ''}
-                                </div>
-                            `).join('')}
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #00f3ff;">Country Code:</strong> 
+                            <span>${ipInfo.country || 'N/A'}</span>
+                        </div>
+                        <div style="padding: 10px; background: rgba(0, 243, 255, 0.1); border-radius: 4px; margin-top: 15px;">
+                            <i class="fas fa-shield-halved"></i> 
+                            <span style="font-size: 12px;">Use a VPN for enhanced privacy</span>
                         </div>
                     </div>
                 `;
-            }).join('')}
-        </div>
-    `;
-
-    contentDiv.innerHTML = html;
-}
-
-async function updateProgress(course, module) {
-    if (!authToken) {
-        showInfo('🔑 Please login to track progress');
-        setTimeout(() => showModal('loginModal'), 500);
-        return;
-    }
-
-    showLoading(true, 'Updating progress...');
-
-    try {
-        const response = await apiRequest(`${API_BASE}/api/progress`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify({ 
-                course, 
-                module, 
-                completed: true,
-                securityToken
-            })
-        });
-
-        if (response.success) {
-            showSuccess(`✅ Progress updated for ${formatCourseName(course)}!`);
-            await loadUserProgress();
-            trackEvent('progress_update', { course, module });
-        } else {
-            showError('Failed to update progress. Please try again.');
+                resultDiv.classList.add('show');
+            }
         }
     } catch (error) {
-        showError('Failed to update progress. Please try again.');
-        console.error('📊 Progress update error:', error);
+        showToast('Failed to check IP. Please try again.', 'error');
+        console.error('IP check error:', error);
     } finally {
         showLoading(false);
     }
 }
 
-// ========================================
-// 🛠️ CYBER TOOLS SYSTEM
-// ========================================
-
-async function checkIP() {
-    const button = event?.currentTarget;
-    if (button) {
-        button.disabled = true;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
-    }
-
-    try {
-        const response = await apiRequest(`${API_BASE}/api/tools/ip`, {
-            headers: { 'X-Security-Token': securityToken }
-        });
-        
-        if (response.success) {
-            const resultDiv = document.getElementById('ipResult');
-            if (resultDiv) {
-                const ipInfo = response.data.ipInfo;
-                resultDiv.innerHTML = `
-                    <div class="ip-result-card cyber-card">
-                        <div class="ip-header">
-                            <i class="fas fa-globe fa-2x cyber-gradient-text"></i>
-                            <h4>Your IP Information</h4>
-                        </div>
-                        <div class="ip-details">
-                            <div class="ip-row">
-                                <span class="ip-label"><i class="fas fa-fingerprint"></i> IP Address:</span>
-                                <span class="ip-value">${ipInfo.ip || 'Unknown'}</span>
-                            </div>
-                            <div class="ip-row">
-                                <span class="ip-label"><i class="fas fa-map-marker-alt"></i> Location:</span>
-                                <span class="ip-value">${ipInfo.city || 'Unknown'}, ${ipInfo.region || 'Unknown'}, ${ipInfo.country || 'Unknown'}</span>
-                            </div>
-                            <div class="ip-row">
-                                <span class="ip-label"><i class="fas fa-flag"></i> Country Code:</span>
-                                <span class="ip-value">${ipInfo.country || 'N/A'}</span>
-                            </div>
-                        </div>
-                        <div class="ip-security">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Keep your IP secure. Consider using a VPN for enhanced privacy.</span>
-                        </div>
-                    </div>
-                `;
-                resultDiv.style.display = 'block';
-                resultDiv.classList.add('show');
-                
-                trackEvent('tool_ip_check', { ip: ipInfo.ip });
-            }
-        }
-    } catch (error) {
-        showError('Failed to check IP. Please try again.');
-        console.error('🌐 IP check error:', error);
-    } finally {
-        if (button) {
-            button.disabled = false;
-            button.innerHTML = '<i class="fas fa-magnifying-glass"></i> Check My IP';
-        }
-    }
-}
-
-async function checkPasswordStrength() {
-    const password = document.getElementById('passwordInput')?.value;
-    const resultDiv = document.getElementById('passwordResult');
+function togglePasswordVisibility() {
+    const input = document.getElementById('passwordInput');
+    const btn = event.currentTarget;
     
-    if (!password || password.length < 4) {
-        if (resultDiv) resultDiv.innerHTML = '';
-        return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    } else {
+        input.type = 'password';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
     }
-
-    // Debounce to avoid too many API calls
-    if (this.passwordTimeout) clearTimeout(this.passwordTimeout);
-    this.passwordTimeout = setTimeout(async () => {
-        try {
-            const strength = getPasswordStrength(password);
-            
-            let color = '#ef4444';
-            let icon = 'fa-times-circle';
-            
-            if (strength.score >= 80) {
-                color = '#10b981';
-                icon = 'fa-check-circle';
-            } else if (strength.score >= 60) {
-                color = '#f59e0b';
-                icon = 'fa-exclamation-triangle';
-            } else if (strength.score >= 40) {
-                color = '#fbbf24';
-                icon = 'fa-exclamation-triangle';
-            }
-
-            let feedbackHTML = '';
-            if (strength.feedback.length > 0) {
-                feedbackHTML = `
-                    <div class="password-feedback">
-                        <h5><i class="fas fa-lightbulb"></i> Suggestions:</h5>
-                        <ul>
-                            ${strength.feedback.map(f => `<li>${f}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            }
-
-            if (resultDiv) {
-                resultDiv.innerHTML = `
-                    <div class="password-strength-card">
-                        <div class="strength-header">
-                            <i class="fas ${icon}" style="color: ${color};"></i>
-                            <span class="strength-label" style="color: ${color};">${strength.level}</span>
-                            <span class="strength-score">${Math.round(strength.score)}%</span>
-                        </div>
-                        <div class="strength-bar">
-                            <div class="strength-fill" style="width: ${strength.score}%; background: ${color};"></div>
-                        </div>
-                        ${feedbackHTML}
-                        <div class="password-tips">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Use a password manager to generate and store strong passwords securely.</span>
-                        </div>
-                    </div>
-                `;
-                resultDiv.style.display = 'block';
-                resultDiv.classList.add('show');
-                
-                trackEvent('tool_password_check', { score: strength.score, level: strength.level });
-            }
-        } catch (error) {
-            console.error('🔑 Password check failed:', error);
-        }
-    }, 300);
 }
 
 function showVPNSimulator() {
@@ -659,258 +519,196 @@ function showVPNSimulator() {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>VPN Simulator - Cyber Learning Hub</title>
+            <title>VPN Encryption Visualizer - CyberHub</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body { 
-                    font-family: 'Segoe UI', Arial, sans-serif; 
-                    padding: 30px; 
-                    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-                    color: #e2e8f0;
-                    overflow-x: hidden;
+                    font-family: 'JetBrains Mono', monospace;
+                    background: linear-gradient(135deg, #0a0e27, #121829);
+                    color: #fff;
+                    padding: 40px;
                 }
-                .header { text-align: center; margin-bottom: 30px; }
-                .header h2 { 
-                    color: #6366f1; 
-                    font-size: 2em;
-                    margin-bottom: 10px;
-                    text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+                h1 {
+                    color: #00f3ff;
+                    text-align: center;
+                    margin-bottom: 40px;
+                    font-size: 32px;
+                    text-shadow: 0 0 20px #00f3ff;
                 }
-                .network-diagram { 
-                    display: flex; 
-                    justify-content: space-around; 
-                    margin: 40px 0; 
-                    position: relative;
-                    padding: 40px 0;
-                }
-                .node { 
-                    text-align: center; 
-                    padding: 25px; 
-                    background: rgba(255, 255, 255, 0.05);
-                    border-radius: 15px; 
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-                    width: 180px;
-                    border: 2px solid rgba(99, 102, 241, 0.3);
-                    transition: all 0.3s ease;
-                }
-                .node:hover {
-                    background: rgba(99, 102, 241, 0.1);
-                    transform: translateY(-5px);
-                    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.4);
-                }
-                .node h3 { 
-                    color: #6366f1; 
-                    margin-bottom: 15px; 
-                    font-size: 1.2em;
+                .diagram {
                     display: flex;
+                    justify-content: space-around;
+                    align-items: center;
+                    margin: 50px 0;
+                }
+                .node {
+                    width: 150px;
+                    height: 150px;
+                    background: rgba(0, 243, 255, 0.1);
+                    border: 2px solid #00f3ff;
+                    border-radius: 12px;
+                    display: flex;
+                    flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    gap: 10px;
+                    text-align: center;
+                    padding: 20px;
+                    box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
                 }
-                .node p { 
-                    color: #cbd5e1; 
-                    font-size: 0.95em;
-                    word-break: break-all;
+                .node i {
+                    font-size: 40px;
+                    margin-bottom: 10px;
+                    color: #00f3ff;
                 }
-                .line { 
-                    position: relative; 
-                    height: 3px; 
-                    background: rgba(255, 255, 255, 0.1); 
-                    margin: 60px 0; 
-                }
-                .encrypted { 
-                    background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
-                    height: 6px; 
-                    position: absolute; 
-                    top: -2px; 
-                    left: 25%; 
-                    width: 50%;
-                    animation: pulse 2s ease-in-out infinite;
+                .arrow {
+                    font-size: 40px;
+                    color: #9d00ff;
+                    animation: pulse 2s infinite;
                 }
                 @keyframes pulse {
                     0%, 100% { opacity: 1; }
                     50% { opacity: 0.5; }
                 }
-                .label { 
-                    position: absolute; 
-                    top: -35px; 
-                    left: 50%; 
-                    transform: translateX(-50%);
-                    background: linear-gradient(135deg, #10b981, #0ea5e9);
-                    color: white; 
-                    padding: 8px 16px; 
-                    border-radius: 25px; 
-                    font-size: 14px; 
-                    font-weight: bold;
-                    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-                    animation: bounce 2s ease-in-out infinite;
+                .info {
+                    background: rgba(0, 243, 255, 0.05);
+                    border: 1px solid #00f3ff;
+                    border-radius: 8px;
+                    padding: 30px;
+                    margin-top: 40px;
                 }
-                @keyframes bounce {
-                    0%, 100% { transform: translateX(-50%) translateY(0); }
-                    50% { transform: translateX(-50%) translateY(-10px); }
+                .info h2 {
+                    color: #00f3ff;
+                    margin-bottom: 20px;
                 }
-                .info { 
-                    background: rgba(255, 255, 255, 0.05);
-                    padding: 25px; 
-                    border-radius: 15px; 
-                    margin-top: 30px;
-                    border: 2px solid rgba(16, 185, 129, 0.3);
-                }
-                .info h3 { 
-                    color: #10b981; 
-                    margin-bottom: 20px; 
-                    font-size: 1.5em;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                }
-                .info ol { 
-                    color: #e2e8f0; 
+                .info ol {
                     line-height: 2;
-                    padding-left: 25px;
                 }
-                .info li { margin-bottom: 10px; }
-                .security-badge {
-                    display: inline-block;
-                    background: linear-gradient(135deg, #10b981, #0ea5e9);
-                    color: white;
-                    padding: 5px 15px;
-                    border-radius: 20px;
-                    font-size: 0.85em;
-                    margin-top: 15px;
-                    font-weight: 600;
-                }
-                .data-flow {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    pointer-events: none;
-                }
-                .data-packet {
-                    position: absolute;
-                    width: 12px;
-                    height: 12px;
-                    background: #6366f1;
-                    border-radius: 50%;
-                    box-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
-                    animation: flow 4s linear infinite;
-                }
-                @keyframes flow {
-                    0% { left: 10%; top: 50%; opacity: 0; }
-                    10% { opacity: 1; }
-                    90% { opacity: 1; }
-                    100% { left: 90%; top: 50%; opacity: 0; }
+                .info li {
+                    margin-bottom: 10px;
                 }
             </style>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         </head>
         <body>
-            <div class="header">
-                <h2>🔒 VPN Encryption Visualization</h2>
-                <p style="color: #94a3b8;">Understand how VPNs protect your data with encryption</p>
-            </div>
+            <h1>VPN ENCRYPTION VISUALIZER</h1>
             
-            <div class="network-diagram">
+            <div class="diagram">
                 <div class="node">
-                    <h3>🏠 Your Device</h3>
-                    <p>192.168.1.100</p>
-                </div>
-                <div class="node">
-                    <h3>🛡️ VPN Server</h3>
-                    <p>203.0.113.45</p>
-                </div>
-                <div class="node">
-                    <h3>🌐 Internet</h3>
-                    <p>Public Network</p>
+                    <i class="fas fa-laptop"></i>
+                    <div>Your Device</div>
+                    <small>192.168.1.100</small>
                 </div>
                 
-                <div class="data-flow" id="dataFlow"></div>
-            </div>
-            
-            <div class="line">
-                <div class="encrypted">
-                    <div class="label">🔐 Encrypted Tunnel</div>
+                <div class="arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                
+                <div class="node">
+                    <i class="fas fa-shield-halved"></i>
+                    <div>VPN Server</div>
+                    <small>ENCRYPTED</small>
+                </div>
+                
+                <div class="arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                
+                <div class="node">
+                    <i class="fas fa-globe"></i>
+                    <div>Internet</div>
+                    <small>Destination</small>
                 </div>
             </div>
             
             <div class="info">
-                <h3><i class="fas fa-book"></i> How VPN Works:</h3>
+                <h2>HOW VPN WORKS:</h2>
                 <ol>
-                    <li><strong>Your data is encrypted</strong> before leaving your device using strong encryption algorithms</li>
-                    <li><strong>Encrypted data travels</strong> through a secure tunnel to the VPN server</li>
-                    <li><strong>VPN server decrypts</strong> the data and forwards it to the destination</li>
-                    <li><strong>Response follows</strong> the same encrypted path back to you</li>
-                    <li><strong>Your IP is hidden</strong> and your location appears to be the VPN server's location</li>
+                    <li><strong>Encryption:</strong> Your data is encrypted before leaving your device</li>
+                    <li><strong>Tunneling:</strong> Encrypted data travels through a secure tunnel to the VPN server</li>
+                    <li><strong>Decryption:</strong> VPN server decrypts and forwards your request</li>
+                    <li><strong>Privacy:</strong> Your real IP is hidden, server's IP is visible to websites</li>
+                    <li><strong>Security:</strong> All traffic is protected with military-grade encryption</li>
                 </ol>
-                <div class="security-badge">
-                    <i class="fas fa-shield-alt"></i> Military-Grade Encryption
-                </div>
             </div>
-            
-            <script>
-                // Create animated data packets
-                const flowContainer = document.getElementById('dataFlow');
-                for (let i = 0; i < 10; i++) {
-                    const packet = document.createElement('div');
-                    packet.className = 'data-packet';
-                    packet.style.animationDelay = (i * 0.4) + 's';
-                    flowContainer.appendChild(packet);
-                }
-            </script>
         </body>
         </html>
     `);
-    trackEvent('tool_vpn_simulator_open');
+}
+
+async function generateHash() {
+    const text = document.getElementById('hashInput')?.value;
+    const hashType = document.getElementById('hashType')?.value || 'sha256';
+    const resultDiv = document.getElementById('hashResult');
+    
+    if (!text) {
+        showToast('Please enter text to hash', 'error');
+        return;
+    }
+    
+    try {
+        let hash;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        
+        if (hashType === 'sha256') {
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            hash = Array.from(new Uint8Array(hashBuffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        } else if (hashType === 'sha512') {
+            const hashBuffer = await crypto.subtle.digest('SHA-512', data);
+            hash = Array.from(new Uint8Array(hashBuffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        } else {
+            // Simple MD5 simulation (not cryptographically secure)
+            hash = 'MD5 hashing requires external library';
+        }
+        
+        if (resultDiv) {
+            resultDiv.innerHTML = `
+                <div style="padding: 15px;">
+                    <strong style="color: #00f3ff;">${hashType.toUpperCase()} Hash:</strong><br>
+                    <code style="word-break: break-all; color: #39ff14; font-size: 12px;">${hash}</code>
+                </div>
+            `;
+            resultDiv.classList.add('show');
+        }
+    } catch (error) {
+        showToast('Hash generation failed', 'error');
+    }
+}
+
+function scanPorts() {
+    showToast('Port scanning is for demonstration purposes only', 'warning');
+    const resultDiv = document.getElementById('scanResult');
+    
+    if (resultDiv) {
+        resultDiv.innerHTML = `
+            <div style="padding: 15px;">
+                <div style="margin-bottom: 10px; color: #39ff14;">
+                    <i class="fas fa-check"></i> Port 22 (SSH) - OPEN
+                </div>
+                <div style="margin-bottom: 10px; color: #39ff14;">
+                    <i class="fas fa-check"></i> Port 80 (HTTP) - OPEN
+                </div>
+                <div style="margin-bottom: 10px; color: #39ff14;">
+                    <i class="fas fa-check"></i> Port 443 (HTTPS) - OPEN
+                </div>
+                <div style="margin-bottom: 10px; color: #6b7a99;">
+                    <i class="fas fa-times"></i> Port 3306 (MySQL) - CLOSED
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(0, 243, 255, 0.1); border-radius: 4px;">
+                    <i class="fas fa-info-circle"></i> Demo scan completed
+                </div>
+            </div>
+        `;
+        resultDiv.classList.add('show');
+    }
 }
 
 // ========================================
-// 🔒 SECURITY UTILITIES
-// ========================================
-
-// Password strength checker (client-side)
-function getPasswordStrength(password) {
-    let score = 0;
-    const feedback = [];
-
-    // Length check
-    if (password.length >= 12) score += 30;
-    else if (password.length >= 8) score += 20;
-    else feedback.push('Use at least 8 characters');
-
-    // Uppercase check
-    if (/[A-Z]/.test(password)) score += 15;
-    else feedback.push('Add uppercase letters');
-
-    // Lowercase check
-    if (/[a-z]/.test(password)) score += 15;
-    else feedback.push('Add lowercase letters');
-
-    // Number check
-    if (/\d/.test(password)) score += 15;
-    else feedback.push('Add numbers');
-
-    // Special character check
-    if (/[^A-Za-z0-9]/.test(password)) score += 25;
-    else feedback.push('Add special characters (!@#$%^&*)');
-
-    // Additional checks
-    if (password.length >= 16) score += 10;
-    if (/(\w)\1\1/.test(password)) score -= 15; // Repeated characters
-    if (/password|12345|qwerty/i.test(password)) score -= 20; // Common passwords
-
-    score = Math.max(0, Math.min(100, score));
-
-    let level = 'Weak';
-    if (score >= 80) level = 'Strong';
-    else if (score >= 60) level = 'Good';
-    else if (score >= 40) level = 'Moderate';
-
-    return { score, level, feedback };
-}
-
-// ========================================
-// 🌐 API REQUEST HANDLER WITH SECURITY - FIXED
+// API REQUESTS
 // ========================================
 
 async function apiRequest(url, options = {}) {
@@ -918,11 +716,8 @@ async function apiRequest(url, options = {}) {
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
     try {
-        // Add security headers
         const headers = {
             'Content-Type': 'application/json',
-            'X-Client-Token': securityToken,
-            'X-Timestamp': Date.now().toString(),
             ...options.headers
         };
 
@@ -937,18 +732,15 @@ async function apiRequest(url, options = {}) {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            // Try to parse error response
             let errorData = {};
             try {
                 errorData = await response.json();
             } catch (e) {
-                // If JSON parsing fails, use default error
                 errorData = { error: `HTTP error! status: ${response.status}` };
             }
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
 
-        // FIXED: Always parse JSON response (Worker always returns JSON)
         const data = await response.json();
         return {
             success: true,
@@ -965,10 +757,10 @@ async function apiRequest(url, options = {}) {
 }
 
 // ========================================
-// 📱 UI UTILITIES & EFFECTS
+// UI UTILITIES
 // ========================================
 
-function showLoading(show, message = 'Loading...') {
+function showLoading(show) {
     let overlay = document.getElementById('loadingOverlay');
     
     if (show) {
@@ -981,23 +773,26 @@ function showLoading(show, message = 'Loading...') {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.7);
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(5px);
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                z-index: 9999;
-                backdrop-filter: blur(5px);
+                z-index: 10000;
             `;
             document.body.appendChild(overlay);
         }
         
         overlay.innerHTML = `
-            <div style="text-align: center; color: white;">
-                <div class="cyber-spinner" style="margin-bottom: 20px;">
-                    <i class="fas fa-spinner fa-spin fa-3x" style="color: #6366f1;"></i>
-                </div>
-                <p style="font-size: 1.2em; margin-top: 10px;">${message}</p>
+            <div style="text-align: center;">
+                <div style="width: 50px; height: 50px; border: 3px solid rgba(0, 243, 255, 0.3); border-top-color: #00f3ff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="color: #00f3ff; margin-top: 20px; font-family: 'Orbitron', sans-serif;">PROCESSING...</p>
             </div>
+            <style>
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            </style>
         `;
     } else if (overlay) {
         overlay.remove();
@@ -1007,629 +802,51 @@ function showLoading(show, message = 'Loading...') {
 function showModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        modal.style.display = 'flex';
+        modal.classList.add('show');
         document.body.style.overflow = 'hidden';
-        
-        // Add animation
-        setTimeout(() => {
-            const content = modal.querySelector('.modal-content');
-            if (content) {
-                content.style.opacity = '1';
-                content.style.transform = 'translateY(0)';
-            }
-        }, 10);
-        
-        trackEvent('modal_open', { modal: modalId });
     }
 }
 
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        const content = modal.querySelector('.modal-content');
-        if (content) {
-            content.style.opacity = '0';
-            content.style.transform = 'translateY(20px)';
-        }
-        
-        setTimeout(() => {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }, 300);
-        
-        trackEvent('modal_close', { modal: modalId });
-    }
-}
-
-function setupPreloader() {
-    const preloader = document.getElementById('preloader');
-    if (!preloader) return;
-
-    // Matrix animation effect
-    const matrixContainer = document.querySelector('.cyber-matrix');
-    if (matrixContainer) {
-        // Update loading percentage
-        const percentageElement = document.querySelector('.loading-percentage');
-        let percent = 0;
-        const interval = setInterval(() => {
-            percent += Math.random() * 3;
-            if (percent >= 100) {
-                percent = 100;
-                clearInterval(interval);
-            }
-            if (percentageElement) {
-                percentageElement.textContent = Math.min(Math.floor(percent), 100) + '%';
-            }
-            document.querySelector('.loading-fill').style.width = percent + '%';
-        }, 80);
-    }
-
-    // Hide preloader after animations complete
-    setTimeout(() => {
-        preloader.classList.add('hidden');
+        modal.classList.remove('show');
         document.body.style.overflow = 'auto';
-        trackEvent('preloader_hidden');
-    }, 2000);
-}
-
-function initializePageComponents() {
-    setupNavigation();
-    setupCourseCards();
-    setupToolCards();
-    setupTestimonialSlider();
-    setupFormValidation();
-}
-
-function setupNavigation() {
-    // Logo click
-    const logoSection = document.querySelector('.logo-section');
-    if (logoSection) {
-        logoSection.addEventListener('click', (e) => {
-            if (!e.target.closest('button')) {
-                window.location.href = '#home';
-            }
-        });
-    }
-
-    // Smooth scroll for nav links
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            const targetId = this.getAttribute('href');
-            if (targetId.startsWith('#')) {
-                e.preventDefault();
-                const target = document.querySelector(targetId);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    
-                    // Close mobile menu if open
-                    const navLinks = document.querySelector('.nav-links');
-                    if (navLinks && navLinks.classList.contains('show')) {
-                        navLinks.classList.remove('show');
-                        const icon = document.getElementById('mobileMenuToggle')?.querySelector('i');
-                        if (icon) {
-                            icon.classList.remove('fa-times');
-                            icon.classList.add('fa-bars');
-                        }
-                    }
-                }
-            }
-        });
-    });
-}
-
-function setupCourseCards() {
-    const courseCards = document.querySelectorAll('.course-card');
-    courseCards.forEach(card => {
-        // Hover effect
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-10px)';
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0)';
-        });
-        
-        // Click to navigate
-        card.addEventListener('click', (e) => {
-            if (!e.target.closest('button')) {
-                const course = card.dataset.course;
-                if (course) {
-                    window.location.href = `courses/${course}.html`;
-                }
-            }
-        });
-    });
-}
-
-function setupToolCards() {
-    const toolCards = document.querySelectorAll('.tool-card');
-    toolCards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-5px)';
-            card.style.boxShadow = '0 15px 40px rgba(99, 102, 241, 0.3)';
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0)';
-            card.style.boxShadow = '';
-        });
-    });
-}
-
-function setupTestimonialSlider() {
-    const testimonials = document.querySelectorAll('.testimonial-card');
-    if (testimonials.length <= 1) return;
-
-    // Show all testimonials with proper styling
-    testimonials.forEach((testimonial, index) => {
-        testimonial.style.opacity = '1';
-        testimonial.style.transform = 'translateY(0)';
-        testimonial.style.zIndex = '1';
-        
-        // Add click to bring to front
-        testimonial.addEventListener('click', () => {
-            // Reset all
-            testimonials.forEach(t => {
-                t.style.zIndex = '1';
-                t.style.transform = 'translateY(0)';
-                t.style.boxShadow = '';
-            });
-            
-            // Bring selected to front
-            testimonial.style.zIndex = '10';
-            testimonial.style.transform = 'translateY(-5px)';
-            testimonial.style.boxShadow = '0 15px 40px rgba(99, 102, 241, 0.3)';
-        });
-    });
-    
-    // Auto-rotate highlight
-    let currentIndex = 0;
-    setInterval(() => {
-        testimonials.forEach(t => {
-            t.style.zIndex = '1';
-            t.style.transform = 'translateY(0)';
-            t.style.boxShadow = '';
-        });
-        
-        currentIndex = (currentIndex + 1) % testimonials.length;
-        testimonials[currentIndex].style.zIndex = '10';
-        testimonials[currentIndex].style.transform = 'translateY(-5px)';
-        testimonials[currentIndex].style.boxShadow = '0 15px 40px rgba(99, 102, 241, 0.3)';
-    }, 5000);
-}
-
-function setupFormValidation() {
-    // Password strength checker for registration
-    const registerPasswordInput = document.getElementById('registerPassword');
-    if (registerPasswordInput) {
-        registerPasswordInput.addEventListener('input', function() {
-            const password = this.value;
-            const strengthIndicator = document.getElementById('registerPasswordStrength');
-            if (!strengthIndicator) return;
-
-            const strength = getPasswordStrength(password);
-            
-            let color = '#ef4444';
-            if (strength.score >= 80) color = '#10b981';
-            else if (strength.score >= 60) color = '#f59e0b';
-            else if (strength.score >= 40) color = '#fbbf24';
-
-            let feedbackHTML = '';
-            if (strength.feedback.length > 0 && password.length > 0) {
-                feedbackHTML = `<ul style="margin-top: 8px; font-size: 0.85em; color: #64748b;">${strength.feedback.map(f => `<li>${f}</li>`).join('')}</ul>`;
-            }
-
-            strengthIndicator.innerHTML = `
-                <div style="margin-top: 10px;">
-                    <div style="background: ${color}; height: 4px; width: 100%; border-radius: 2px; margin-bottom: 5px;">
-                        <div style="background: white; height: 4px; width: ${100 - strength.score}%; border-radius: 2px;"></div>
-                    </div>
-                    <p style="margin: 5px 0; font-size: 0.85em; color: ${color}; font-weight: 600;">
-                        ${strength.level} (${Math.round(strength.score)}%)
-                    </p>
-                    ${feedbackHTML}
-                </div>
-            `;
-        });
-    }
-
-    // Form validation
-    const registerForm = document.querySelector('#registerModal form');
-    if (registerForm) {
-        registerForm.addEventListener('submit', function(e) {
-            const password = document.getElementById('registerPassword')?.value;
-            const confirmPassword = document.getElementById('confirmPassword')?.value;
-
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                showError('Passwords do not match!');
-                return false;
-            }
-
-            if (password && password.length < 8) {
-                e.preventDefault();
-                showError('Password must be at least 8 characters long!');
-                return false;
-            }
-        });
     }
 }
 
-function initializeCyberAnimations() {
-    // Initialize binary background if present
-    const binaryStreams = document.querySelectorAll('.binary-stream');
-    binaryStreams.forEach(stream => {
-        stream.innerHTML = stream.innerHTML.repeat(4); // Repeat for continuous effect
-    });
-    
-    // Add cyber pulse effect to important elements
-    const pulseElements = document.querySelectorAll('.cyber-pulse');
-    pulseElements.forEach(element => {
-        element.style.animation = 'cyberPulse 2s ease-in-out infinite';
-    });
-}
-
-// ========================================
-// 🍪 COOKIE CONSENT SYSTEM
-// ========================================
-
-function acceptCookies() {
-    localStorage.setItem('cookiesAccepted', 'true');
-    const banner = document.getElementById('cookieBanner');
-    if (banner) {
-        banner.style.opacity = '0';
-        banner.style.transform = 'translateY(100%)';
-        setTimeout(() => {
-            banner.style.display = 'none';
-        }, 500);
-    }
-    showSuccess('🍪 Cookies accepted! You can now use all features.');
-    trackEvent('cookies_accepted');
-}
-
-function declineCookies() {
-    localStorage.setItem('cookiesAccepted', 'false');
-    const banner = document.getElementById('cookieBanner');
-    if (banner) {
-        banner.style.opacity = '0';
-        banner.style.transform = 'translateY(100%)';
-        setTimeout(() => {
-            banner.style.display = 'none';
-        }, 500);
-    }
-    showInfo('🍪 Cookies declined. Some features may be limited.');
-    trackEvent('cookies_declined');
-}
-
-function customizeCookies() {
-    const modal = document.createElement('div');
-    modal.className = 'auth-modal';
-    modal.id = 'cookieSettingsModal';
-    modal.innerHTML = `
-        <div class="modal-content cyber-card">
-            <button class="modal-close" onclick="closeModal('cookieSettingsModal')">
-                <i class="fas fa-xmark"></i>
-            </button>
-            <div class="modal-header">
-                <i class="fas fa-cookie modal-icon cyber-gradient"></i>
-                <h2>Cookie Settings</h2>
-                <p>Choose which cookies you want to allow</p>
-            </div>
-            <div class="cookie-settings-content">
-                <div class="cookie-setting-item">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="essentialCookies" checked disabled>
-                        <span><i class="fas fa-check-circle"></i> Essential Cookies <small>(Required)</small></span>
-                    </label>
-                    <p>These cookies are necessary for the website to function properly.</p>
-                </div>
-                
-                <div class="cookie-setting-item">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="analyticsCookies" checked>
-                        <span><i class="fas fa-chart-line"></i> Analytics Cookies</span>
-                    </label>
-                    <p>Help us understand how visitors interact with our website.</p>
-                </div>
-                
-                <div class="cookie-setting-item">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="functionalCookies" checked>
-                        <span><i class="fas fa-cog"></i> Functional Cookies</span>
-                    </label>
-                    <p>Remember your preferences and settings.</p>
-                </div>
-                
-                <div class="cookie-setting-item">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="marketingCookies">
-                        <span><i class="fas fa-bullhorn"></i> Marketing Cookies</span>
-                    </label>
-                    <p>Used to deliver personalized ads and track marketing campaigns.</p>
-                </div>
-            </div>
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button class="btn btn-primary" onclick="saveCookieSettings()">
-                    <i class="fas fa-save"></i> Save Preferences
-                </button>
-                <button class="btn btn-outline" onclick="closeModal('cookieSettingsModal')">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    showModal('cookieSettingsModal');
-    trackEvent('cookies_customize_opened');
-}
-
-function saveCookieSettings() {
-    const settings = {
-        essential: true, // Always enabled
-        analytics: document.getElementById('analyticsCookies').checked,
-        functional: document.getElementById('functionalCookies').checked,
-        marketing: document.getElementById('marketingCookies').checked
-    };
-    
-    localStorage.setItem('cookieSettings', JSON.stringify(settings));
-    localStorage.setItem('cookiesAccepted', 'custom');
-    
-    closeModal('cookieSettingsModal');
-    const banner = document.getElementById('cookieBanner');
-    if (banner) {
-        banner.style.display = 'none';
-    }
-    
-    showSuccess('✅ Cookie preferences saved!');
-    trackEvent('cookies_customized', settings);
-}
-
-// Show cookie banner on page load
-window.addEventListener('load', () => {
-    const cookieBanner = document.getElementById('cookieBanner');
-    const cookiesAccepted = localStorage.getItem('cookiesAccepted');
-    
-    if (cookieBanner && cookiesAccepted === null) {
-        setTimeout(() => {
-            cookieBanner.style.display = 'block';
-            setTimeout(() => {
-                cookieBanner.style.opacity = '1';
-                cookieBanner.style.transform = 'translateY(0)';
-            }, 100);
-        }, 2000);
-    }
-});
-
-// ========================================
-// 📊 ANALYTICS & TRACKING
-// ========================================
-
-function trackEvent(eventName, data = {}) {
-    console.log(`📊 Event tracked: ${eventName}`, data);
-}
-
-// ========================================
-// 🧪 UTILITY FUNCTIONS
-// ========================================
-
-function formatCourseName(name) {
-    return name
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase())
-        .replace('Cybersecurity', '🔒 Cybersecurity')
-        .replace('Networking', '🌐 Networking')
-        .replace('Linux', '🐧 Linux');
-}
-
-function formatModuleName(name) {
-    return name
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase());
-}
-
-function getCourseIcon(course) {
-    const icons = {
-        'cybersecurity': 'fa-lock',
-        'networking': 'fa-network-wired',
-        'linux': 'fa-linux',
-        'github': 'fa-github'
-    };
-    return icons[course] || 'fa-graduation-cap';
-}
-
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-// Enhanced toast notifications
-function showError(message) {
-    showToast(message, 'error');
-}
-
-function showSuccess(message) {
-    showToast(message, 'success');
-}
-
-function showInfo(message) {
-    showToast(message, 'info');
+function switchModal(fromId, toId) {
+    closeModal(fromId);
+    setTimeout(() => showModal(toId), 300);
 }
 
 function showToast(message, type = 'info') {
-    // Remove existing toasts
-    document.querySelectorAll('.cyber-toast').forEach(t => t.remove());
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
     
     const toast = document.createElement('div');
-    toast.className = `cyber-toast cyber-toast-${type}`;
+    toast.className = `toast ${type}`;
     toast.innerHTML = `
-        <div class="toast-icon">
-            <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 
+                          type === 'error' ? 'fa-exclamation-circle' : 
+                          type === 'warning' ? 'fa-exclamation-triangle' : 
+                          'fa-info-circle'}"></i>
+            <span>${message}</span>
         </div>
-        <div class="toast-message">${message}</div>
-        <button class="toast-close" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
     `;
     
-    document.body.appendChild(toast);
+    container.appendChild(toast);
     
-    // Auto remove after 5 seconds
     setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateX(400px)';
+        toast.style.transform = 'translateX(100%)';
         setTimeout(() => toast.remove(), 300);
-    }, 5000);
-    
-    trackEvent('toast_shown', { type, message });
-}
-
-// Add toast styles if not already present
-if (!document.getElementById('toast-styles')) {
-    const toastStyles = document.createElement('style');
-    toastStyles.id = 'toast-styles';
-    toastStyles.textContent = `
-        .cyber-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 24px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            z-index: 10000;
-            animation: toastSlideIn 0.3s ease;
-            transform: translateX(0);
-            opacity: 1;
-            transition: all 0.3s ease;
-        }
-        
-        @keyframes toastSlideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        .toast-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        
-        .cyber-toast-error .toast-icon {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-        
-        .cyber-toast-success .toast-icon {
-            background: linear-gradient(135deg, #10b981, #0da271);
-            color: white;
-        }
-        
-        .cyber-toast-info .toast-icon {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-        }
-        
-        .toast-message {
-            color: #1e293b;
-            font-weight: 500;
-        }
-        
-        .toast-close {
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            font-size: 18px;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
-        
-        .toast-close:hover {
-            background: #e2e8f0;
-            color: #1e293b;
-        }
-    `;
-    document.head.appendChild(toastStyles);
+    }, 3000);
 }
 
 // ========================================
-// 📥 LOAD INITIAL DATA
-// ========================================
-
-async function loadInitialData() {
-    try {
-        // Load hero stats with animation
-        setTimeout(() => {
-            animateCounter('studentCount', 10000, 2000);
-            animateCounter('courseCount', 15, 1500);
-            animateCounter('toolCount', 8, 1200);
-            animateCounter('certCount', 5000, 2500);
-        }, 500);
-        
-        trackEvent('initial_data_loaded');
-    } catch (error) {
-        console.error('Failed to load initial data:', error);
-    }
-}
-
-async function loadUserData() {
-    if (!authToken) return;
-
-    try {
-        console.log('👤 Loading user data for:', currentUser?.username);
-    } catch (error) {
-        console.error('Failed to load user data:', error);
-    }
-}
-
-// ========================================
-// 📊 ANIMATED COUNTER
-// ========================================
-
-function animateCounter(elementId, target, duration = 2000) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-
-    let start = 0;
-    const increment = target / (duration / 16);
-    const startTime = performance.now();
-    
-    function updateCounter(timestamp) {
-        const progress = Math.min((timestamp - startTime) / duration, 1);
-        const current = Math.floor(progress * target);
-        
-        element.textContent = current.toLocaleString();
-        
-        if (progress < 1) {
-            requestAnimationFrame(updateCounter);
-        } else {
-            element.textContent = target.toLocaleString();
-        }
-    }
-    
-    requestAnimationFrame(updateCounter);
-}
-
-// ========================================
-// 🎯 EVENT LISTENERS SETUP
+// EVENT LISTENERS
 // ========================================
 
 function setupEventListeners() {
@@ -1644,60 +861,7 @@ function setupEventListeners() {
     if (logoutBtn) logoutBtn.addEventListener('click', logout);
     if (ctaRegisterBtn) ctaRegisterBtn.addEventListener('click', () => showModal('registerModal'));
 
-    // Close modals on click outside
-    document.querySelectorAll('.auth-modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal(modal.id);
-            }
-        });
-    });
-
-    // Close modal on ESC key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.auth-modal').forEach(modal => {
-                if (modal.style.display === 'flex') {
-                    closeModal(modal.id);
-                }
-            });
-        }
-    });
-
-    // Form submissions
-    const loginForm = document.querySelector('#loginModal form');
-    const registerForm = document.querySelector('#registerModal form');
-    
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            login();
-        });
-    }
-    
-    if (registerForm) {
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            register();
-        });
-    }
-
-    // Mobile menu toggle
-    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (mobileMenuToggle && navLinks) {
-        mobileMenuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('show');
-            const icon = mobileMenuToggle.querySelector('i');
-            if (icon) {
-                icon.classList.toggle('fa-times');
-                icon.classList.toggle('fa-bars');
-            }
-        });
-    }
-
-    // Scroll to top button
+    // Scroll to top
     const scrollToTopBtn = document.getElementById('scrollToTop');
     if (scrollToTopBtn) {
         window.addEventListener('scroll', () => {
@@ -1713,63 +877,123 @@ function setupEventListeners() {
         });
     }
 
-    // Newsletter form
-    const newsletterForm = document.querySelector('.newsletter-form');
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = newsletterForm.querySelector('input[type="email"]').value;
-            if (validateEmail(email)) {
-                showSuccess('📧 Thank you for subscribing!');
-                newsletterForm.reset();
-                trackEvent('newsletter_subscribe', { email });
-            } else {
-                showError('Please enter a valid email address');
-            }
-        });
-    }
-
-    // Remember me functionality
-    const rememberMeCheckbox = document.getElementById('rememberMe');
-    if (rememberMeCheckbox) {
-        // Load saved username if available
-        const savedUsername = localStorage.getItem('savedUsername');
-        if (savedUsername && document.getElementById('loginUsername')) {
-            document.getElementById('loginUsername').value = savedUsername;
-            rememberMeCheckbox.checked = true;
-        }
-
-        rememberMeCheckbox.addEventListener('change', function() {
-            if (!this.checked) {
-                localStorage.removeItem('savedUsername');
-            }
-        });
-    }
-
-    // CTA Register button
-    const ctaRegisterBtnElement = document.getElementById('ctaRegisterBtn');
-    if (ctaRegisterBtnElement) {
-        ctaRegisterBtnElement.addEventListener('click', () => {
-            showModal('registerModal');
-        });
-    }
-
-    window.addEventListener('scroll', () => {
-        const sections = document.querySelectorAll('section[id]');
-        const scrollPos = window.scrollY + 100;
-
-        sections.forEach(section => {
-            if (scrollPos >= section.offsetTop && scrollPos < section.offsetTop + section.offsetHeight) {
-                const id = section.getAttribute('id');
-                document.querySelectorAll('.nav-link').forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${id}`) {
-                        link.classList.add('active');
-                    }
-                });
+    // Navigation links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const targetId = link.getAttribute('href');
+            if (targetId.startsWith('#')) {
+                e.preventDefault();
+                scrollToSection(targetId.substring(1));
+                
+                // Update active state
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
             }
         });
     });
+
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', () => {
+            // Toggle mobile menu (implement as needed)
+            console.log('Mobile menu toggle');
+        });
+    }
+
+    // Password input real-time checking
+    const passwordInput = document.getElementById('passwordInput');
+    if (passwordInput) {
+        passwordInput.addEventListener('input', () => {
+            // Add password strength checking if needed
+        });
+    }
+
+    // Register password strength
+    const registerPassword = document.getElementById('registerPassword');
+    if (registerPassword) {
+        registerPassword.addEventListener('input', function() {
+            const strength = getPasswordStrength(this.value);
+            const strengthDiv = document.getElementById('registerPasswordStrength');
+            if (strengthDiv) {
+                strengthDiv.innerHTML = `
+                    <div style="margin-top: 10px;">
+                        <div style="height: 4px; background: rgba(0, 243, 255, 0.2); border-radius: 2px; overflow: hidden;">
+                            <div style="height: 100%; width: ${strength.score}%; background: ${
+                                strength.score >= 80 ? '#39ff14' :
+                                strength.score >= 60 ? '#ffff00' :
+                                strength.score >= 40 ? '#ff9d00' :
+                                '#ff0055'
+                            }; transition: all 0.3s ease;"></div>
+                        </div>
+                        <p style="margin-top: 5px; font-size: 12px; color: ${
+                            strength.score >= 80 ? '#39ff14' :
+                            strength.score >= 60 ? '#ffff00' :
+                            strength.score >= 40 ? '#ff9d00' :
+                            '#ff0055'
+                        };">${strength.level}</p>
+                    </div>
+                `;
+            }
+        });
+    }
+}
+
+// ========================================
+// UTILITIES
+// ========================================
+
+function scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        const offset = 80; // Navbar height
+        const sectionPosition = section.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top: sectionPosition, behavior: 'smooth' });
+    }
+}
+
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function getPasswordStrength(password) {
+    let score = 0;
+    
+    if (password.length >= 12) score += 30;
+    else if (password.length >= 8) score += 20;
+    
+    if (/[A-Z]/.test(password)) score += 15;
+    if (/[a-z]/.test(password)) score += 15;
+    if (/\d/.test(password)) score += 15;
+    if (/[^A-Za-z0-9]/.test(password)) score += 25;
+    
+    score = Math.max(0, Math.min(100, score));
+    
+    let level = 'Weak';
+    if (score >= 80) level = 'Strong';
+    else if (score >= 60) level = 'Good';
+    else if (score >= 40) level = 'Moderate';
+    
+    return { score, level };
+}
+
+function startSessionMonitoring() {
+    setInterval(() => {
+        if (authToken && Date.now() - lastActivity > SESSION_TIMEOUT) {
+            logout();
+            showToast('Session expired due to inactivity', 'warning');
+        }
+    }, 60000);
+    
+    // Update last activity
+    document.addEventListener('mousemove', () => { lastActivity = Date.now(); });
+    document.addEventListener('keypress', () => { lastActivity = Date.now(); });
+    document.addEventListener('click', () => { lastActivity = Date.now(); });
+}
+
+function exportProgress() {
+    showToast('Progress export feature coming soon', 'info');
 }
 
 
@@ -1777,23 +1001,16 @@ window.cyberHub = {
     login,
     register,
     logout,
-    updateProgress,
-    loadUserProgress,
     checkIP,
-    checkPasswordStrength,
     showVPNSimulator,
+    generateHash,
+    scanPorts,
+    togglePasswordVisibility,
     showModal,
     closeModal,
-    showError,
-    showSuccess,
-    showInfo,
-    trackEvent,
-    get currentUser() { return currentUser; },
-    get authToken() { return authToken; },
-    get securityToken() { return securityToken; }
+    switchModal,
+    scrollToSection
 };
 
-console.log('%c✨ CyberHub API initialized', 'color: #8b5cf6; font-weight: bold;');
-console.log('%c📚 Available methods:', 'color: #6366f1;', Object.keys(window.cyberHub));
-console.log('%c🔒 Security Features:', 'color: #ef4444;', 'Worker URL Obfuscated, Session Monitoring, Security Token');
-console.log('%c✅ Syntax Error Fixed:', 'color: #10b981;', 'API response handling corrected');
+console.log('%c🔒 CyberHub API Ready', 'color: #00f3ff; font-size: 14px; font-weight: bold;');
+console.log('%c📡 Backend:', 'color: #9d00ff;', API_BASE);
