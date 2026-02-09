@@ -2,739 +2,855 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="language" content="en">
-    <meta name="author" content="Paras Dhiman">
-    <meta name="designer" content="SoftwareLabs">
-    <meta name="publisher" content="Cyber Learning Hub">
-    <meta name="owner" content="Paras Dhiman">
-    <meta name="copyright" content="© 2026 Cyber Learning Hub">
-    <meta name="robots" content="index, follow">
-    <meta name="googlebot" content="index, follow">
-    <meta name="bingbot" content="index, follow">
-    <meta name="revisit-after" content="7 days">
-
     <meta name="description" content="Master cybersecurity, networking, Linux, and IT skills with interactive courses, practical tools, and progress tracking. Learn from beginner to advanced levels.">
-    <meta name="keywords" content="cybersecurity, IT learning, networking, VPN, Linux, ethical hacking, cybersecurity courses, IT certification, network security, password security, cyber tools">
-    <meta name="subject" content="Cybersecurity Education Platform">
-    <meta name="abstract" content="Comprehensive cybersecurity and IT learning platform">
-    <meta name="topic" content="Information Technology, Cybersecurity, Education">
-
-  
-    <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://kit.fontawesome.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://kit.fontawesome.com;
-    img-src 'self' data: https:;
-    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://kit.fontawesome.com;
-    connect-src 'self' https://cyber-hub.dhimanparas605.workers.dev https:;
-    frame-src 'none';
-    object-src 'none'
-">
-    <meta property="og:title" content="Cyber Learning Hub - Master IT & Cybersecurity">
-    <meta property="og:description" content="Comprehensive cybersecurity and IT learning platform with interactive courses and practical tools.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://Paras367.github.io/Cyber_Hub/">
-    <meta property="og:image" content="https://softwarelabs.lovable.app/logo.svg">
-    <meta property="og:site_name" content="Cyber Learning Hub">
-    <meta property="og:locale" content="en_US">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Cyber Learning Hub - Master IT & Cybersecurity">
-    <meta name="twitter:description" content="Learn cybersecurity, networking, Linux, and more with interactive courses and tools.">
-    <meta name="twitter:image" content="https://softwarelabs.lovable.app/logo.svg">
-    <meta name="twitter:site" content="@CyberHubEdu">
+    <meta name="keywords" content="cybersecurity, IT learning, networking, VPN, Linux, ethical hacking, cybersecurity courses, IT certification, network security, password security">
     
-    <title>Cyber Learning Hub 🔒 | Master Cybersecurity, Networking & Linux Skills</title>
-
+    <title>CyberHub 🔒 | Elite Cybersecurity Training Platform</title>
+    
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
-    <link rel="manifest" href="/SoftwareLabs/manifest.json">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
+    <div id="cursor" class="terminal-cursor"></div>
+    <canvas id="matrixCanvas" class="matrix-bg"></canvas>
     <div class="preloader" id="preloader">
         <div class="preloader-content">
-            <div class="cyber-matrix">
-                <div class="matrix-column" style="--delay: 0s">01010101</div>
-                <div class="matrix-column" style="--delay: 0.5s">10101010</div>
-                <div class="matrix-column" style="--delay: 1s">01010101</div>
-                <div class="matrix-column" style="--delay: 1.5s">10101010</div>
-                <div class="matrix-column" style="--delay: 2s">01010101</div>
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="terminal-title">INITIALIZING CYBER_HUB_SYSTEM</span>
+                    <div class="terminal-controls">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+                <div class="terminal-body">
+                    <div class="boot-sequence">
+                        <p><span class="prompt">$</span> Loading security protocols...</p>
+                        <p><span class="prompt">$</span> Initializing encryption modules...</p>
+                        <p><span class="prompt">$</span> Connecting to secure network...</p>
+                        <p><span class="prompt">$</span> <span class="success">SYSTEM READY</span></p>
+                    </div>
+                    <div class="loading-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="progress-text"><span id="loadProgress">0</span>%</div>
+                    </div>
+                </div>
             </div>
-            <div class="cyber-spinner">
-                <i class="fas fa-shield"></i>
-            </div>
-            <h3 class="cyber-text">Initializing Security Protocol...</h3>
-            <div class="loading-bar">
-                <div class="loading-fill"></div>
-            </div>
-            <div class="loading-percentage">0%</div>
         </div>
     </div>
+
 
     <nav class="navbar">
         <div class="container">
             <div class="navbar-content">
                 <div class="logo-section">
-                    <div class="logo-icon cyber-pulse">
-                        <i class="fas fa-shield"></i>
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-halved"></i>
+                        <div class="logo-pulse"></div>
                     </div>
                     <div class="logo-text">
-                        <span class="logo-main">Cyber<span class="logo-accent">Hub</span></span>
-                        <span class="logo-sub">Learning Platform</span>
+                        <span class="logo-main">CYBER<span class="logo-accent">HUB</span></span>
+                        <span class="logo-sub">ELITE TRAINING</span>
                     </div>
                 </div>
                 
                 <div class="nav-menu" id="navMenu">
                     <ul class="nav-links">
-                        <li><a href="#home" class="nav-link active"><i class="fas fa-house"></i> Home</a></li>
-                        <li><a href="#courses" class="nav-link"><i class="fas fa-graduation-cap"></i> Courses</a></li>
-                        <li><a href="#tools" class="nav-link"><i class="fas fa-wrench"></i> Tools</a></li>
-                        <li><a href="#features" class="nav-link"><i class="fas fa-fire"></i> Features</a></li>
-                        <li><a href="#testimonials" class="nav-link"><i class="fas fa-users"></i> Testimonials</a></li>
+                        <li><a href="#home" class="nav-link active" data-text="HOME"><i class="fas fa-house"></i> HOME</a></li>
+                        <li><a href="#courses" class="nav-link" data-text="COURSES"><i class="fas fa-graduation-cap"></i> COURSES</a></li>
+                        <li><a href="#labs" class="nav-link" data-text="LABS"><i class="fas fa-flask"></i> LABS</a></li>
+                        <li><a href="#tools" class="nav-link" data-text="TOOLS"><i class="fas fa-wrench"></i> TOOLS</a></li>
+                        <li><a href="#leaderboard" class="nav-link" data-text="LEADERBOARD"><i class="fas fa-trophy"></i> LEADERBOARD</a></li>
                     </ul>
                 </div>
                 
                 <div class="nav-auth">
                     <button class="btn btn-outline" id="loginBtn">
-                        <i class="fas fa-arrow-right-to-bracket"></i> Login
+                        <i class="fas fa-right-to-bracket"></i> LOGIN
                     </button>
-                    <button class="btn btn-primary cyber-gradient" id="registerBtn">
-                        <i class="fas fa-user-plus"></i> Register
+                    <button class="btn btn-primary" id="registerBtn">
+                        <i class="fas fa-user-plus"></i> REGISTER
                     </button>
-                    <div id="userMenu" style="display: none; align-items: center; gap: 15px;">
-                        <div class="user-info cyber-glow">
-                            <i class="fas fa-circle-user"></i>
+                    <div id="userMenu" style="display: none;">
+                        <div class="user-info">
+                            <i class="fas fa-user-circle"></i>
                             <span id="userName" class="username"></span>
+                            <span class="user-badge">ELITE</span>
                         </div>
-                        <button class="btn btn-outline" id="logoutBtn">
-                            <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                        <button class="btn btn-outline btn-sm" id="logoutBtn">
+                            <i class="fas fa-right-from-bracket"></i> LOGOUT
                         </button>
                     </div>
                 </div>
                 
                 <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <i class="fas fa-bars"></i>
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- ========================================
-         HERO SECTION
-         ======================================== -->
+
     <section class="hero" id="home">
         <div class="container">
-            <div class="hero-content">
-                <div class="hero-badge cyber-badge">
-                    <i class="fas fa-certificate"></i> Trusted by 10,000+ Students
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-bolt"></i> TRUSTED BY 50,000+ SECURITY PROFESSIONALS
+                    </div>
+                    
+                    <h1 class="hero-title">
+                        <span class="glitch" data-text="MASTER">MASTER</span>
+                        <span class="highlight">CYBERSECURITY</span>
+                        <span class="typing-text">& PENETRATION TESTING</span>
+                    </h1>
+                    
+                    <p class="hero-subtitle">
+                        Train like elite hackers. Access cutting-edge labs, real-world scenarios, 
+                        and hands-on penetration testing environments. From zero to hero.
+                    </p>
+                    
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary btn-lg" onclick="scrollToSection('courses')">
+                            <i class="fas fa-rocket"></i> START TRAINING
+                            <div class="btn-glow"></div>
+                        </button>
+                        <button class="btn btn-outline btn-lg" onclick="scrollToSection('labs')">
+                            <i class="fas fa-terminal"></i> LIVE LABS
+                        </button>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number"><span class="counter" data-target="50000">0</span>+</div>
+                            <div class="stat-label">STUDENTS</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number"><span class="counter" data-target="25">0</span>+</div>
+                            <div class="stat-label">COURSES</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number"><span class="counter" data-target="100">0</span>+</div>
+                            <div class="stat-label">LABS</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number"><span class="counter" data-target="15">0</span>K+</div>
+                            <div class="stat-label">CERTS ISSUED</div>
+                        </div>
+                    </div>
                 </div>
                 
-                <h1 class="hero-title cyber-text">
-                    <span class="highlight cyber-gradient-text">Master</span> Cybersecurity & IT Skills
-                </h1>
-                
-                <p class="hero-subtitle">
-                    Comprehensive learning platform for cybersecurity, networking, Linux, and more. 
-                    Learn from beginner to advanced levels with hands-on exercises and real-world scenarios.
-                </p>
-                
-                <div class="hero-buttons">
-                    <button class="btn btn-primary btn-lg cyber-gradient" onclick="document.querySelector('#courses').scrollIntoView({behavior: 'smooth'})">
-                        <i class="fas fa-play"></i> Start Learning
-                    </button>
-                    <button class="btn btn-outline btn-lg" onclick="document.querySelector('#tools').scrollIntoView({behavior: 'smooth'})">
-                        <i class="fas fa-wrench"></i> Try Tools
-                    </button>
-                </div>
-                
-                <div class="hero-stats cyber-stats">
-                    <div class="stat-item">
-                        <div class="stat-icon">
-                            <i class="fas fa-user-graduate"></i>
+                <div class="hero-visual">
+                    <div class="terminal-demo">
+                        <div class="terminal-window">
+                            <div class="terminal-header">
+                                <span class="terminal-title">elite@cyberhub:~$</span>
+                                <div class="terminal-controls">
+                                    <span></span><span></span><span></span>
+                                </div>
+                            </div>
+                            <div class="terminal-body">
+                                <div id="terminalOutput"></div>
+                            </div>
                         </div>
-                        <div class="stat-number" id="studentCount">0</div>
-                        <div class="stat-label">Students</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-icon">
-                            <i class="fas fa-book"></i>
+                    
+                    <div class="floating-elements">
+                        <div class="float-card" style="--delay: 0s">
+                            <i class="fas fa-shield-halved"></i>
+                            <span>ENCRYPTION</span>
                         </div>
-                        <div class="stat-number" id="courseCount">0</div>
-                        <div class="stat-label">Courses</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon">
-                            <i class="fas fa-toolbox"></i>
+                        <div class="float-card" style="--delay: 0.5s">
+                            <i class="fas fa-bug"></i>
+                            <span>PENETRATION</span>
                         </div>
-                        <div class="stat-number" id="toolCount">0</div>
-                        <div class="stat-label">Tools</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-icon">
-                            <i class="fas fa-award"></i>
+                        <div class="float-card" style="--delay: 1s">
+                            <i class="fas fa-network-wired"></i>
+                            <span>NETWORKING</span>
                         </div>
-                        <div class="stat-number" id="certCount">0</div>
-                        <div class="stat-label">Certificates</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="hero-illustration">
-                <div class="cyber-animation">
-                    <div class="code-stream">
-                        <div class="code-line"><span class="keyword">const</span> <span class="variable">cyberSecurity</span> = <span class="string">'awesome'</span>;</div>
-                        <div class="code-line"><span class="keyword">function</span> <span class="function">learn()</span> { <span class="keyword">return</span> <span class="string">'success'</span>; }</div>
-                        <div class="code-line"><span class="comment">// Security first approach</span></div>
-                        <div class="code-line"><span class="keyword">if</span> (<span class="variable">password</span>.<span class="function">strength</span>() > <span class="number">80</span>) {</div>
-                        <div class="code-line">  <span class="keyword">console</span>.<span class="function">log</span>(<span class="string">'Secure!'</span>);</div>
-                        <div class="code-line">}</div>
-                        <div class="code-line"><span class="keyword">const</span> <span class="variable">skills</span> = [<span class="string">'ethical-hacking'</span>, <span class="string">'network-security'</span>, <span class="string">'linux-admin'</span>];</div>
-                    </div>
-                    <div class="security-shield cyber-pulse">
-                        <i class="fas fa-shield fa-4x"></i>
-                    </div>
-                    <div class="binary-background">
-                        <div class="binary-stream">01010101010101010101010101010101</div>
-                        <div class="binary-stream">10101010101010101010101010101010</div>
-                        <div class="binary-stream">01010101010101010101010101010101</div>
+                        <div class="float-card" style="--delay: 1.5s">
+                            <i class="fab fa-linux"></i>
+                            <span>LINUX</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ========================================
-         FEATURES SECTION
-         ======================================== -->
-    <section class="features" id="features">
+
+    <div class="live-stats-bar">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title cyber-gradient-text">
-                    <i class="fas fa-fire"></i> Why Choose CyberHub?
-                </h2>
-                <p class="section-subtitle">Everything you need to master cybersecurity and IT skills</p>
-            </div>
-            
-            <div class="features-grid">
-                <div class="feature-card cyber-card">
-                    <div class="feature-icon cyber-gradient">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <h3><i class="fas fa-book-open"></i> Interactive Courses</h3>
-                    <p>Learn from beginner to advanced levels with hands-on exercises, labs, and real-world scenarios.</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-circle-check"></i> Step-by-step tutorials</li>
-                        <li><i class="fas fa-circle-check"></i> Hands-on labs</li>
-                        <li><i class="fas fa-circle-check"></i> Expert instructors</li>
-                    </ul>
+            <div class="live-stats">
+                <div class="live-stat">
+                    <i class="fas fa-users"></i>
+                    <span><span class="counter" data-target="1247">0</span> ONLINE NOW</span>
                 </div>
-                
-                <div class="feature-card cyber-card">
-                    <div class="feature-icon cyber-gradient">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3><i class="fas fa-chart-line"></i> Progress Tracking</h3>
-                    <p>Monitor your learning journey with detailed analytics, badges, and completion certificates.</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-circle-check"></i> Real-time progress</li>
-                        <li><i class="fas fa-circle-check"></i> Skill assessments</li>
-                        <li><i class="fas fa-circle-check"></i> Achievement badges</li>
-                    </ul>
+                <div class="live-stat">
+                    <i class="fas fa-server"></i>
+                    <span>99.9% UPTIME</span>
                 </div>
-                
-                <div class="feature-card cyber-card">
-                    <div class="feature-icon cyber-gradient">
-                        <i class="fas fa-wrench"></i>
-                    </div>
-                    <h3><i class="fas fa-wrench"></i> Practical Tools</h3>
-                    <p>Access built-in cybersecurity tools like IP checker, password tester, and VPN simulators.</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-circle-check"></i> Security scanners</li>
-                        <li><i class="fas fa-circle-check"></i> Network tools</li>
-                        <li><i class="fas fa-circle-check"></i> Encryption utilities</li>
-                    </ul>
-                </div>
-                
-                <div class="feature-card cyber-card">
-                    <div class="feature-icon cyber-gradient">
-                        <i class="fas fa-award"></i>
-                    </div>
-                    <h3><i class="fas fa-award"></i> Certification Path</h3>
-                    <p>Earn recognized certificates and showcase your skills to employers and clients.</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-circle-check"></i> Industry-recognized certs</li>
-                        <li><i class="fas fa-circle-check"></i> Skill validation</li>
-                        <li><i class="fas fa-circle-check"></i> Career advancement</li>
-                    </ul>
-                </div>
-                
-                <div class="feature-card cyber-card">
-                    <div class="feature-icon cyber-gradient">
-                        <i class="fas fa-people-group"></i>
-                    </div>
-                    <h3><i class="fas fa-people-group"></i> Community Support</h3>
-                    <p>Join our active community of learners, get help, and collaborate on projects.</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-circle-check"></i> Discussion forums</li>
-                        <li><i class="fas fa-circle-check"></i> Mentor support</li>
-                        <li><i class="fas fa-circle-check"></i> Peer learning</li>
-                    </ul>
-                </div>
-                
-                <div class="feature-card cyber-card">
-                    <div class="feature-icon cyber-gradient">
-                        <i class="fas fa-mobile-screen-button"></i>
-                    </div>
-                    <h3><i class="fas fa-mobile-screen-button"></i> Learn Anywhere</h3>
-                    <p>Access courses and tools from any device, anytime, anywhere. Learn at your own pace.</p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-circle-check"></i> Mobile friendly</li>
-                        <li><i class="fas fa-circle-check"></i> Offline access</li>
-                        <li><i class="fas fa-circle-check"></i> Self-paced learning</li>
-                    </ul>
+                <div class="live-stat">
+                    <i class="fas fa-trophy"></i>
+                    <span><span class="counter" data-target="342">0</span> CERTS TODAY</span>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- ========================================
-         COURSES SECTION
-         ======================================== -->
     <section class="courses" id="courses">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title cyber-gradient-text">
-                    <i class="fas fa-graduation-cap"></i> Available Courses
+                <div class="section-tag">TRAINING PROGRAMS</div>
+                <h2 class="section-title">
+                    <span class="glitch" data-text="ELITE">ELITE</span> COURSES
                 </h2>
-                <p class="section-subtitle">Master in-demand cybersecurity and IT skills</p>
+                <p class="section-subtitle">
+                    Comprehensive training paths from beginner to advanced penetration testing
+                </p>
             </div>
             
             <div class="course-grid">
-                <div class="course-card cyber-card" data-course="cybersecurity">
-                    <div class="course-badge cyber-gradient">Popular</div>
-                    <div class="course-icon cyber-gradient">
-                        <i class="fas fa-user-secret"></i>
+                <div class="course-card featured" data-course="penetration-testing">
+                    <div class="course-badge">MOST POPULAR</div>
+                    <div class="course-header">
+                        <div class="course-icon">
+                            <i class="fas fa-user-secret"></i>
+                        </div>
+                        <div class="course-level">ADVANCED</div>
                     </div>
-                    <h3><i class="fas fa-lock"></i> Cybersecurity Fundamentals</h3>
-                    <p class="course-desc">Learn about threats, vulnerabilities, and security best practices.</p>
+                    <h3>PENETRATION TESTING MASTERY</h3>
+                    <p>Master ethical hacking, vulnerability assessment, and exploitation techniques used by professional penetration testers.</p>
                     <div class="course-meta">
-                        <span><i class="fas fa-clock"></i> 8 Modules</span>
-                        <span><i class="fas fa-user-graduate"></i> Beginner</span>
+                        <span><i class="fas fa-clock"></i> 120 HOURS</span>
+                        <span><i class="fas fa-layer-group"></i> 12 MODULES</span>
+                        <span><i class="fas fa-flask"></i> 50 LABS</span>
                     </div>
-                    <div class="course-footer">
-                        <button class="btn btn-primary btn-sm cyber-gradient">
-                            <i class="fas fa-arrow-right"></i> Start Learning
-                        </button>
+                    <div class="course-tech">
+                        <span class="tech-tag">METASPLOIT</span>
+                        <span class="tech-tag">BURP SUITE</span>
+                        <span class="tech-tag">NMAP</span>
                     </div>
+                    <button class="btn btn-primary btn-block">
+                        <i class="fas fa-rocket"></i> START COURSE
+                    </button>
                 </div>
                 
-                <div class="course-card cyber-card" data-course="networking">
-                    <div class="course-icon cyber-gradient">
-                        <i class="fas fa-network-wired"></i>
+                <div class="course-card" data-course="cybersecurity">
+                    <div class="course-header">
+                        <div class="course-icon">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <div class="course-level">BEGINNER</div>
                     </div>
-                    <h3><i class="fas fa-route"></i> Networking & VPNs</h3>
-                    <p class="course-desc">Understand network protocols, VPN concepts, and secure communications.</p>
+                    <h3>CYBERSECURITY FUNDAMENTALS</h3>
+                    <p>Learn security principles, threat modeling, cryptography, and defense strategies from the ground up.</p>
                     <div class="course-meta">
-                        <span><i class="fas fa-clock"></i> 6 Modules</span>
-                        <span><i class="fas fa-user-graduate"></i> Intermediate</span>
+                        <span><i class="fas fa-clock"></i> 60 HOURS</span>
+                        <span><i class="fas fa-layer-group"></i> 8 MODULES</span>
+                        <span><i class="fas fa-flask"></i> 25 LABS</span>
                     </div>
-                    <div class="course-footer">
-                        <button class="btn btn-primary btn-sm cyber-gradient">
-                            <i class="fas fa-arrow-right"></i> Start Learning
-                        </button>
+                    <div class="course-tech">
+                        <span class="tech-tag">CIA TRIAD</span>
+                        <span class="tech-tag">ENCRYPTION</span>
                     </div>
+                    <button class="btn btn-outline btn-block">
+                        <i class="fas fa-play"></i> START COURSE
+                    </button>
                 </div>
                 
-                <div class="course-card cyber-card" data-course="linux">
-                    <div class="course-icon cyber-gradient">
-                        <i class="fab fa-linux"></i>
+                <div class="course-card" data-course="networking">
+                    <div class="course-header">
+                        <div class="course-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div class="course-level">INTERMEDIATE</div>
                     </div>
-                    <h3><i class="fab fa-linux"></i> Linux Administration</h3>
-                    <p class="course-desc">Master Linux commands, system administration, and security hardening.</p>
+                    <h3>NETWORK SECURITY & VPN</h3>
+                    <p>Deep dive into network protocols, VPN configuration, firewall management, and network traffic analysis.</p>
                     <div class="course-meta">
-                        <span><i class="fas fa-clock"></i> 7 Modules</span>
-                        <span><i class="fas fa-user-graduate"></i> Intermediate</span>
+                        <span><i class="fas fa-clock"></i> 80 HOURS</span>
+                        <span><i class="fas fa-layer-group"></i> 10 MODULES</span>
+                        <span><i class="fas fa-flask"></i> 35 LABS</span>
                     </div>
-                    <div class="course-footer">
-                        <button class="btn btn-primary btn-sm cyber-gradient">
-                            <i class="fas fa-arrow-right"></i> Start Learning
-                        </button>
+                    <div class="course-tech">
+                        <span class="tech-tag">WIRESHARK</span>
+                        <span class="tech-tag">OPENVPN</span>
                     </div>
+                    <button class="btn btn-outline btn-block">
+                        <i class="fas fa-play"></i> START COURSE
+                    </button>
                 </div>
                 
-                <div class="course-card coming-soon cyber-card">
-                    <div class="course-icon cyber-gradient">
-                        <i class="fab fa-github"></i>
+                <div class="course-card" data-course="linux">
+                    <div class="course-header">
+                        <div class="course-icon">
+                            <i class="fab fa-linux"></i>
+                        </div>
+                        <div class="course-level">INTERMEDIATE</div>
                     </div>
-                    <h3><i class="fab fa-github"></i> GitHub & DevOps</h3>
-                    <p class="course-desc">Learn version control, CI/CD, and collaborative development workflows.</p>
+                    <h3>LINUX SYSTEM ADMINISTRATION</h3>
+                    <p>Master Linux command line, shell scripting, system hardening, and server administration.</p>
                     <div class="course-meta">
-                        <span><i class="fas fa-clock"></i> Coming Soon</span>
-                        <span><i class="fas fa-user-graduate"></i> All Levels</span>
+                        <span><i class="fas fa-clock"></i> 70 HOURS</span>
+                        <span><i class="fas fa-layer-group"></i> 9 MODULES</span>
+                        <span><i class="fas fa-flask"></i> 30 LABS</span>
                     </div>
-                    <div class="course-footer">
-                        <button class="btn btn-outline btn-sm disabled">
-                            <i class="fas fa-bell"></i> Notify Me
-                        </button>
+                    <div class="course-tech">
+                        <span class="tech-tag">BASH</span>
+                        <span class="tech-tag">SYSTEMD</span>
+                    </div>
+                    <button class="btn btn-outline btn-block">
+                        <i class="fas fa-play"></i> START COURSE
+                    </button>
+                </div>
+                
+                <div class="course-card" data-course="web-security">
+                    <div class="course-header">
+                        <div class="course-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="course-level">ADVANCED</div>
+                    </div>
+                    <h3>WEB APPLICATION SECURITY</h3>
+                    <p>Learn OWASP Top 10, SQL injection, XSS, CSRF, and advanced web exploitation techniques.</p>
+                    <div class="course-meta">
+                        <span><i class="fas fa-clock"></i> 90 HOURS</span>
+                        <span><i class="fas fa-layer-group"></i> 11 MODULES</span>
+                        <span><i class="fas fa-flask"></i> 40 LABS</span>
+                    </div>
+                    <div class="course-tech">
+                        <span class="tech-tag">OWASP</span>
+                        <span class="tech-tag">SQLMAP</span>
+                    </div>
+                    <button class="btn btn-outline btn-block">
+                        <i class="fas fa-play"></i> START COURSE
+                    </button>
+                </div>
+                
+                <div class="course-card coming-soon">
+                    <div class="course-header">
+                        <div class="course-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="course-level">EXPERT</div>
+                    </div>
+                    <h3>AI SECURITY & ADVERSARIAL ML</h3>
+                    <p>Explore AI/ML security, adversarial attacks, model poisoning, and AI red teaming.</p>
+                    <div class="course-meta">
+                        <span><i class="fas fa-clock"></i> 100 HOURS</span>
+                        <span><i class="fas fa-layer-group"></i> 14 MODULES</span>
+                        <span><i class="fas fa-flask"></i> 45 LABS</span>
+                    </div>
+                    <div class="coming-soon-overlay">
+                        <div class="coming-soon-text">LAUNCHING SOON</div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="view-all">
-                <button class="btn btn-outline btn-lg">
-                    <i class="fas fa-eye"></i> View All Courses
-                </button>
             </div>
         </div>
     </section>
 
-    <!-- ========================================
-         TOOLS SECTION
-         ======================================== -->
+    
+    <section class="labs-section" id="labs">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">HANDS-ON TRAINING</div>
+                <h2 class="section-title">
+                    <span class="glitch" data-text="LIVE">LIVE</span> HACKING LABS
+                </h2>
+                <p class="section-subtitle">
+                    Practice on real-world scenarios in isolated, safe environments
+                </p>
+            </div>
+            
+            <div class="labs-grid">
+                <div class="lab-card active-lab">
+                    <div class="lab-status">
+                        <span class="status-dot active"></span>
+                        <span>ACTIVE</span>
+                    </div>
+                    <div class="lab-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3>WEB SERVER EXPLOITATION</h3>
+                    <p>Exploit vulnerable web server configurations and gain root access</p>
+                    <div class="lab-difficulty">
+                        <span>DIFFICULTY:</span>
+                        <div class="difficulty-bars">
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+                    <div class="lab-stats">
+                        <span><i class="fas fa-users"></i> 342 ACTIVE</span>
+                        <span><i class="fas fa-flag-checkered"></i> 15,234 COMPLETED</span>
+                    </div>
+                    <button class="btn btn-primary btn-block">
+                        <i class="fas fa-play"></i> LAUNCH LAB
+                    </button>
+                </div>
+                
+                <div class="lab-card">
+                    <div class="lab-status">
+                        <span class="status-dot"></span>
+                        <span>AVAILABLE</span>
+                    </div>
+                    <div class="lab-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>SQL INJECTION MASTERY</h3>
+                    <p>Master advanced SQL injection techniques and database exploitation</p>
+                    <div class="lab-difficulty">
+                        <span>DIFFICULTY:</span>
+                        <div class="difficulty-bars">
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+                    <div class="lab-stats">
+                        <span><i class="fas fa-users"></i> 89 ACTIVE</span>
+                        <span><i class="fas fa-flag-checkered"></i> 8,921 COMPLETED</span>
+                    </div>
+                    <button class="btn btn-outline btn-block">
+                        <i class="fas fa-play"></i> LAUNCH LAB
+                    </button>
+                </div>
+                
+                <div class="lab-card">
+                    <div class="lab-status">
+                        <span class="status-dot"></span>
+                        <span>AVAILABLE</span>
+                    </div>
+                    <div class="lab-icon">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <h3>WIRELESS NETWORK HACKING</h3>
+                    <p>Crack WPA2 encryption and perform man-in-the-middle attacks</p>
+                    <div class="lab-difficulty">
+                        <span>DIFFICULTY:</span>
+                        <div class="difficulty-bars">
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                        </div>
+                    </div>
+                    <div class="lab-stats">
+                        <span><i class="fas fa-users"></i> 156 ACTIVE</span>
+                        <span><i class="fas fa-flag-checkered"></i> 12,457 COMPLETED</span>
+                    </div>
+                    <button class="btn btn-outline btn-block">
+                        <i class="fas fa-play"></i> LAUNCH LAB
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="tools-section" id="tools">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title cyber-gradient-text">
-                    <i class="fas fa-wrench"></i> Cybersecurity Tools
+                <div class="section-tag">SECURITY UTILITIES</div>
+                <h2 class="section-title">
+                    <span class="glitch" data-text="HACKER">HACKER</span> TOOLKIT
                 </h2>
-                <p class="section-subtitle">Practical tools to enhance your security knowledge</p>
+                <p class="section-subtitle">
+                    Professional-grade security tools and analyzers
+                </p>
             </div>
             
-            <div class="tool-grid">
-                <div class="tool-card cyber-card">
-                    <div class="tool-icon cyber-gradient">
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">
                         <i class="fas fa-globe"></i>
                     </div>
-                    <h3><i class="fas fa-info"></i> IP Address Checker</h3>
-                    <p>Check your public IP address and geolocation information.</p>
+                    <h3>IP INTELLIGENCE</h3>
+                    <p>Advanced IP analysis with geolocation, threat scoring, and VPN detection</p>
                     <button class="btn btn-primary" onclick="checkIP()">
-                        <i class="fas fa-magnifying-glass"></i> Check My IP
+                        <i class="fas fa-search"></i> ANALYZE IP
                     </button>
                     <div id="ipResult" class="tool-result"></div>
                 </div>
                 
-                <div class="tool-card cyber-card">
-                    <div class="tool-icon cyber-gradient">
+                <div class="tool-card">
+                    <div class="tool-icon">
                         <i class="fas fa-key"></i>
                     </div>
-                    <h3><i class="fas fa-lock"></i> Password Strength Tester</h3>
-                    <p>Analyze password strength and get security recommendations.</p>
-                    <input type="password" id="passwordInput" placeholder="Enter password to test..." oninput="checkPasswordStrength()">
+                    <h3>PASSWORD ANALYZER</h3>
+                    <p>Test password strength with entropy calculation and crack time estimation</p>
+                    <div class="password-input-group">
+                        <input type="password" id="passwordInput" placeholder="Enter password to analyze...">
+                        <button class="toggle-visibility" onclick="togglePasswordVisibility()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                     <div id="passwordResult" class="tool-result"></div>
                 </div>
                 
-                <div class="tool-card cyber-card">
-                    <div class="tool-icon cyber-gradient">
-                        <i class="fas fa-user-secret"></i>
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-shield-halved"></i>
                     </div>
-                    <h3><i class="fas fa-route"></i> VPN Concept Simulator</h3>
-                    <p>Visualize how VPN encryption works and protects your data.</p>
+                    <h3>VPN TUNNEL VISUALIZER</h3>
+                    <p>Interactive visualization of VPN encryption and secure tunneling</p>
                     <button class="btn btn-primary" onclick="showVPNSimulator()">
-                        <i class="fas fa-eye"></i> Visualize VPN
+                        <i class="fas fa-diagram-project"></i> VISUALIZE VPN
                     </button>
                 </div>
                 
-                <div class="tool-card cyber-card">
-                    <div class="tool-icon cyber-gradient">
-                        <i class="fas fa-shield"></i>
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-lock"></i>
                     </div>
-                    <h3><i class="fas fa-bug"></i> Security Scanner</h3>
-                    <p>Scan for common security vulnerabilities and get recommendations.</p>
-                    <button class="btn btn-primary disabled">
-                        <i class="fas fa-spinner fa-spin"></i> Coming Soon
+                    <h3>HASH GENERATOR</h3>
+                    <p>Generate cryptographic hashes (MD5, SHA-256, SHA-512, bcrypt)</p>
+                    <input type="text" id="hashInput" placeholder="Enter text to hash...">
+                    <select id="hashType" class="hash-select">
+                        <option value="md5">MD5</option>
+                        <option value="sha256" selected>SHA-256</option>
+                        <option value="sha512">SHA-512</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="generateHash()">
+                        <i class="fas fa-hashtag"></i> GENERATE
+                    </button>
+                    <div id="hashResult" class="tool-result"></div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <h3>PORT SCANNER</h3>
+                    <p>Scan for open ports and identify running services</p>
+                    <input type="text" id="scanTarget" placeholder="Enter IP or hostname...">
+                    <button class="btn btn-primary" onclick="scanPorts()">
+                        <i class="fas fa-radar"></i> SCAN PORTS
+                    </button>
+                    <div id="scanResult" class="tool-result"></div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>EMAIL HEADER ANALYZER</h3>
+                    <p>Analyze email headers for phishing detection and SPF/DKIM validation</p>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-upload"></i> UPLOAD HEADER
                     </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ========================================
-         TESTIMONIALS SECTION - FIXED
-         ======================================== -->
-    <section class="testimonials" id="testimonials">
+    <section class="leaderboard-section" id="leaderboard">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title cyber-gradient-text">
-                    <i class="fas fa-quote-left"></i> What Our Students Say
+                <div class="section-tag">HALL OF FAME</div>
+                <h2 class="section-title">
+                    <span class="glitch" data-text="TOP">TOP</span> HACKERS
                 </h2>
-                <p class="section-subtitle">Success stories from our learning community</p>
+                <p class="section-subtitle">
+                    Elite performers ranked by completed labs and earned certifications
+                </p>
             </div>
             
-            <div class="testimonial-grid">
-                <div class="testimonial-card cyber-card">
-                    <div class="testimonial-header">
-                        <div class="testimonial-avatar cyber-gradient">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="testimonial-info">
-                            <h4>John Doe</h4>
-                            <div class="rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="testimonial-text">
-                        "This platform transformed my career! The hands-on labs and practical tools made learning cybersecurity concepts so much easier."
-                    </p>
+            <div class="leaderboard-container">
+                <div class="leaderboard-filters">
+                    <button class="filter-btn active">ALL TIME</button>
+                    <button class="filter-btn">THIS MONTH</button>
+                    <button class="filter-btn">THIS WEEK</button>
                 </div>
                 
-                <div class="testimonial-card cyber-card">
-                    <div class="testimonial-header">
-                        <div class="testimonial-avatar cyber-gradient">
-                            <i class="fas fa-user"></i>
+                <div class="leaderboard-list">
+                    <div class="leaderboard-item rank-1">
+                        <div class="rank-badge">
+                            <i class="fas fa-crown"></i>
+                            <span>1</span>
                         </div>
-                        <div class="testimonial-info">
-                            <h4>Jane Smith</h4>
-                            <div class="rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-stroke"></i>
+                        <div class="user-avatar">
+                            <i class="fas fa-user-ninja"></i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">Shadow_Hunter</div>
+                            <div class="user-stats">
+                                <span><i class="fas fa-flask"></i> 247 labs</span>
+                                <span><i class="fas fa-certificate"></i> 15 certs</span>
                             </div>
                         </div>
-                    </div>
-                    <p class="testimonial-text">
-                        "The progress tracking feature keeps me motivated. I love how I can see my improvement over time with detailed analytics."
-                    </p>
-                </div>
-                
-                <div class="testimonial-card cyber-card">
-                    <div class="testimonial-header">
-                        <div class="testimonial-avatar cyber-gradient">
-                            <i class="fas fa-user"></i>
+                        <div class="user-score">
+                            <span class="score-number">98,450</span>
+                            <span class="score-label">POINTS</span>
                         </div>
-                        <div class="testimonial-info">
-                            <h4>Alex Johnson</h4>
-                            <div class="rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                    </div>
+                    
+                    <div class="leaderboard-item rank-2">
+                        <div class="rank-badge">
+                            <span>2</span>
+                        </div>
+                        <div class="user-avatar">
+                            <i class="fas fa-user-secret"></i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">CyberPhantom</div>
+                            <div class="user-stats">
+                                <span><i class="fas fa-flask"></i> 231 labs</span>
+                                <span><i class="fas fa-certificate"></i> 14 certs</span>
                             </div>
                         </div>
+                        <div class="user-score">
+                            <span class="score-number">94,120</span>
+                            <span class="score-label">POINTS</span>
+                        </div>
                     </div>
-                    <p class="testimonial-text">
-                        "The cybersecurity tools are amazing! The password strength tester and VPN simulator really helped me understand security concepts better."
-                    </p>
+                    
+                    <div class="leaderboard-item rank-3">
+                        <div class="rank-badge">
+                            <span>3</span>
+                        </div>
+                        <div class="user-avatar">
+                            <i class="fas fa-user-astronaut"></i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">NullByte_Master</div>
+                            <div class="user-stats">
+                                <span><i class="fas fa-flask"></i> 218 labs</span>
+                                <span><i class="fas fa-certificate"></i> 13 certs</span>
+                            </div>
+                        </div>
+                        <div class="user-score">
+                            <span class="score-number">89,760</span>
+                            <span class="score-label">POINTS</span>
+                        </div>
+                    </div>
+
+                    <div class="leaderboard-item">
+                        <div class="rank-number">4</div>
+                        <div class="user-avatar"><i class="fas fa-user-tie"></i></div>
+                        <div class="user-details">
+                            <div class="user-name">Binary_Warrior</div>
+                            <div class="user-stats">
+                                <span><i class="fas fa-flask"></i> 205 labs</span>
+                                <span><i class="fas fa-certificate"></i> 12 certs</span>
+                            </div>
+                        </div>
+                        <div class="user-score">
+                            <span class="score-number">85,340</span>
+                            <span class="score-label">POINTS</span>
+                        </div>
+                    </div>
+                    
+                    <div class="leaderboard-item">
+                        <div class="rank-number">5</div>
+                        <div class="user-avatar"><i class="fas fa-user-shield"></i></div>
+                        <div class="user-details">
+                            <div class="user-name">CodeBreaker_X</div>
+                            <div class="user-stats">
+                                <span><i class="fas fa-flask"></i> 198 labs</span>
+                                <span><i class="fas fa-certificate"></i> 11 certs</span>
+                            </div>
+                        </div>
+                        <div class="user-score">
+                            <span class="score-number">81,920</span>
+                            <span class="score-label">POINTS</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="cta-section cyber-gradient-bg">
+    <section class="user-dashboard" id="userDashboard" style="display: none;">
         <div class="container">
-            <div class="cta-content">
-                <h2 class="cyber-text">Ready to Master Cybersecurity?</h2>
-                <p>Join thousands of students who are building their IT and cybersecurity skills today.</p>
-                <div class="cta-buttons">
-                    <button class="btn btn-primary btn-lg cyber-gradient" id="ctaRegisterBtn">
-                        <i class="fas fa-user-plus"></i> Get Started Free
-                    </button>
-                    <button class="btn btn-outline btn-lg" onclick="document.querySelector('#courses').scrollIntoView({behavior: 'smooth'})">
-                        <i class="fas fa-book"></i> Browse Courses
-                    </button>
-                </div>
+            <div class="dashboard-header">
+                <h2><i class="fas fa-chart-line"></i> YOUR PROGRESS</h2>
+                <button class="btn btn-outline" onclick="exportProgress()">
+                    <i class="fas fa-download"></i> EXPORT DATA
+                </button>
             </div>
-        </div>
-    </section>
-
-
-    <section class="user-dashboard" id="userDashboard">
-        <div class="container">
-            <h3 class="cyber-gradient-text"><i class="fas fa-gauge-high"></i> Your Learning Progress</h3>
             <div id="progressContent"></div>
         </div>
     </section>
 
-    <footer id="footer">
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>READY TO BECOME AN ELITE HACKER?</h2>
+                <p>Join thousands of security professionals mastering cybersecurity</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary btn-lg" id="ctaRegisterBtn">
+                        <i class="fas fa-rocket"></i> START FREE TRIAL
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="scrollToSection('courses')">
+                        <i class="fas fa-graduation-cap"></i> VIEW COURSES
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <div class="footer-logo cyber-gradient">
-                        <i class="fas fa-shield"></i>
-                        <span>Cyber<span class="logo-accent">Hub</span></span>
+                    <div class="footer-logo">
+                        <i class="fas fa-shield-halved"></i>
+                        <span>CYBER<span class="accent">HUB</span></span>
                     </div>
-                    <p>Master cybersecurity and IT skills with interactive courses and practical tools.</p>
+                    <p>Elite cybersecurity training platform for the next generation of security professionals.</p>
                     <div class="social-links">
-                        <a href="#" class="social-link"><i class="fas fa-twitter"></i></a>
-                        <a href="#" class="social-link"><i class="fas fa-linkedin"></i></a>
-                        <a href="#" class="social-link"><i class="fas fa-github"></i></a>
-                        <a href="#" class="social-link"><i class="fas fa-youtube"></i></a>
-                        <a href="#" class="social-link"><i class="fas fa-discord"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-discord"></i></a>
                     </div>
                 </div>
                 
                 <div class="footer-col">
-                    <h4 class="cyber-gradient-text"><i class="fas fa-graduation-cap"></i> Courses</h4>
-                    <ul class="footer-links">
-                        <li><a href="courses/cybersecurity.html"><i class="fas fa-lock"></i> Cybersecurity</a></li>
-                        <li><a href="courses/networking.html"><i class="fas fa-network-wired"></i> Networking & VPNs</a></li>
-                        <li><a href="courses/linux.html"><i class="fab fa-linux"></i> Linux Administration</a></li>
-                        <li><a href="#"><i class="fab fa-github"></i> GitHub & DevOps</a></li>
+                    <h4>TRAINING</h4>
+                    <ul>
+                        <li><a href="#courses">All Courses</a></li>
+                        <li><a href="#labs">Live Labs</a></li>
+                        <li><a href="#">Certifications</a></li>
+                        <li><a href="#">Learning Paths</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-col">
-                    <h4 class="cyber-gradient-text"><i class="fas fa-wrench"></i> Tools</h4>
-                    <ul class="footer-links">
-                        <li><a href="#tools"><i class="fas fa-globe"></i> IP Checker</a></li>
-                        <li><a href="#tools"><i class="fas fa-key"></i> Password Tester</a></li>
-                        <li><a href="#tools"><i class="fas fa-route"></i> VPN Simulator</a></li>
-                        <li><a href="#"><i class="fas fa-shield"></i> Security Scanner</a></li>
+                    <h4>RESOURCES</h4>
+                    <ul>
+                        <li><a href="#tools">Security Tools</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Community Forum</a></li>
+                        <li><a href="#">Blog</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-col">
-                    <h4 class="cyber-gradient-text"><i class="fas fa-link"></i> Quick Links</h4>
-                    <ul class="footer-links">
-                        <li><a href="#home"><i class="fas fa-house"></i> Home</a></li>
-                        <li><a href="#courses"><i class="fas fa-graduation-cap"></i> Courses</a></li>
-                        <li><a href="#tools"><i class="fas fa-wrench"></i> Tools</a></li>
-                        <li><a href="#features"><i class="fas fa-fire"></i> Features</a></li>
-                        <li><a href="#testimonials"><i class="fas fa-users"></i> Testimonials</a></li>
+                    <h4>COMPANY</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press Kit</a></li>
                     </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h4 class="cyber-gradient-text"><i class="fas fa-envelope"></i> Newsletter</h4>
-                    <p>Subscribe for updates and exclusive content.</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Your email" required>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </form>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2026 <span class="highlight cyber-gradient-text">Cyber Learning Hub</span>. All rights reserved.</p>
-                <div class="footer-links-inline">
-                    <a href="#"><i class="fas fa-shield"></i> Privacy Policy</a>
-                    <a href="#"><i class="fas fa-file-contract"></i> Terms of Service</a>
-                    <a href="#"><i class="fas fa-cookie"></i> Cookie Policy</a>
+                <p>&copy; 2026 CyberHub. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
                 </div>
             </div>
         </div>
     </footer>
 
     <button class="scroll-to-top" id="scrollToTop">
-        <i class="fas fa-arrow-up"></i>
+        <i class="fas fa-chevron-up"></i>
     </button>
 
     <div class="auth-modal" id="loginModal">
-        <div class="modal-content cyber-card">
+        <div class="modal-overlay" onclick="closeModal('loginModal')"></div>
+        <div class="modal-content">
             <button class="modal-close" onclick="closeModal('loginModal')">
-                <i class="fas fa-xmark"></i>
+                <i class="fas fa-times"></i>
             </button>
             <div class="modal-header">
-                <i class="fas fa-arrow-right-to-bracket modal-icon cyber-gradient"></i>
-                <h2>Login to Your Account</h2>
-                <p>Access your courses and track your progress</p>
+                <h2>ACCESS SYSTEM</h2>
+                <p>Enter your credentials to continue</p>
             </div>
             <form class="auth-form" onsubmit="event.preventDefault(); login();">
                 <div class="form-group">
-                    <label><i class="fas fa-user"></i> Username</label>
-                    <input type="text" id="loginUsername" placeholder="Enter your username" required>
+                    <label><i class="fas fa-user"></i> USERNAME</label>
+                    <input type="text" id="loginUsername" placeholder="Enter username" required>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    <label><i class="fas fa-lock"></i> PASSWORD</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password" required>
                 </div>
                 <div class="form-options">
                     <label class="checkbox-label">
                         <input type="checkbox" id="rememberMe">
-                        <span><i class="fas fa-check"></i> Remember me</span>
+                        <span>Remember me</span>
                     </label>
-                    <a href="#" class="forgot-password"><i class="fas fa-key"></i> Forgot password?</a>
+                    <a href="#" class="forgot-link">Forgot password?</a>
                 </div>
-                <button class="btn btn-primary btn-block cyber-gradient" type="submit">
-                    <i class="fas fa-arrow-right-to-bracket"></i> Login
+                <button class="btn btn-primary btn-block" type="submit">
+                    <i class="fas fa-sign-in-alt"></i> LOGIN
                 </button>
-                <div class="modal-footer">
-                    <p>Don't have an account? <a href="#" onclick="showModal('registerModal'); closeModal('loginModal');"><i class="fas fa-user-plus"></i> Register here</a></p>
-                </div>
             </form>
+            <div class="modal-footer">
+                <p>Don't have an account? <a href="#" onclick="switchModal('loginModal', 'registerModal')">Register here</a></p>
+            </div>
         </div>
     </div>
 
-
     <div class="auth-modal" id="registerModal">
-        <div class="modal-content cyber-card">
+        <div class="modal-overlay" onclick="closeModal('registerModal')"></div>
+        <div class="modal-content">
             <button class="modal-close" onclick="closeModal('registerModal')">
-                <i class="fas fa-xmark"></i>
+                <i class="fas fa-times"></i>
             </button>
             <div class="modal-header">
-                <i class="fas fa-user-plus modal-icon cyber-gradient"></i>
-                <h2>Create New Account</h2>
-                <p>Start your cybersecurity learning journey today</p>
+                <h2>CREATE ACCOUNT</h2>
+                <p>Join the elite security community</p>
             </div>
             <form class="auth-form" onsubmit="event.preventDefault(); register();">
                 <div class="form-row">
                     <div class="form-group">
-                        <label><i class="fas fa-user"></i> Username</label>
-                        <input type="text" id="registerUsername" placeholder="Choose a username" required>
+                        <label><i class="fas fa-user"></i> USERNAME</label>
+                        <input type="text" id="registerUsername" placeholder="Choose username" required>
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                        <label><i class="fas fa-envelope"></i> EMAIL</label>
+                        <input type="email" id="registerEmail" placeholder="Enter email" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Password</label>
-                    <input type="password" id="registerPassword" placeholder="Create a strong password" required>
-                    <div class="password-strength" id="registerPasswordStrength"></div>
+                    <label><i class="fas fa-lock"></i> PASSWORD</label>
+                    <input type="password" id="registerPassword" placeholder="Create password" required>
+                    <div id="registerPasswordStrength" class="password-strength"></div>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Confirm Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                    <label><i class="fas fa-lock"></i> CONFIRM PASSWORD</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm password" required>
                 </div>
                 <div class="form-checkbox">
                     <label class="checkbox-label">
                         <input type="checkbox" required>
-                        <span>I agree to the <a href="#"><i class="fas fa-file-contract"></i> Terms of Service</a> and <a href="#"><i class="fas fa-shield"></i> Privacy Policy</a></span>
+                        <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
                     </label>
                 </div>
-                <button class="btn btn-primary btn-block cyber-gradient" type="submit">
-                    <i class="fas fa-user-plus"></i> Create Account
+                <button class="btn btn-primary btn-block" type="submit">
+                    <i class="fas fa-user-plus"></i> CREATE ACCOUNT
                 </button>
-                <div class="modal-footer">
-                    <p>Already have an account? <a href="#" onclick="showModal('loginModal'); closeModal('registerModal');"><i class="fas fa-arrow-right-to-bracket"></i> Login here</a></p>
-                </div>
             </form>
+            <div class="modal-footer">
+                <p>Already have an account? <a href="#" onclick="switchModal('registerModal', 'loginModal')">Login here</a></p>
+            </div>
         </div>
     </div>
 
-    <div class="cookie-banner" id="cookieBanner">
-        <div class="cookie-content">
-            <div class="cookie-icon cyber-gradient">
-                <i class="fas fa-cookie-bite"></i>
-            </div>
-            <div class="cookie-text">
-                <h4><i class="fas fa-cookie"></i> We use cookies</h4>
-                <p>We use cookies to enhance your experience, analyze traffic, and personalize content. By continuing, you agree to our <a href="#"><i class="fas fa-shield"></i> Cookie Policy</a>.</p>
-            </div>
-            <div class="cookie-buttons">
-                <button class="btn btn-primary btn-sm cyber-gradient" onclick="acceptCookies()"><i class="fas fa-check"></i> Accept All</button>
-                <button class="btn btn-outline btn-sm" onclick="declineCookies()"><i class="fas fa-xmark"></i> Decline</button>
-                <button class="btn btn-text btn-sm" onclick="customizeCookies()"><i class="fas fa-gear"></i> Customize</button>
-            </div>
-        </div>
-    </div>
+    <div id="toastContainer" class="toast-container"></div>
 
     <script src="script.js"></script>
 </body>
