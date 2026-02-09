@@ -963,25 +963,57 @@ function setupToolCards() {
 }
 
 function setupTestimonialSlider() {
-    // Simple auto-rotate testimonials
     const testimonials = document.querySelectorAll('.testimonial-card');
-    if (testimonials.length > 1) {
-        let currentIndex = 0;
-        
-        setInterval(() => {
-            testimonials.forEach((testimonial, index) => {
-                if (index === currentIndex) {
-                    testimonial.style.opacity = '1';
-                    testimonial.style.transform = 'translateY(0)';
-                } else {
-                    testimonial.style.opacity = '0.3';
-                    testimonial.style.transform = 'translateY(20px)';
-                }
-            });
-            
-            currentIndex = (currentIndex + 1) % testimonials.length;
-        }, 5000);
-    }
+    if (testimonials.length <= 1) return;
+
+    let currentIndex = 0;
+    const totalTestimonials = testimonials.length;
+
+    // Show first testimonial, hide others
+    testimonials.forEach((testimonial, index) => {
+        if (index === 0) {
+            testimonial.style.opacity = '1';
+            testimonial.style.transform = 'translateY(0)';
+            testimonial.style.zIndex = '10';
+        } else {
+            testimonial.style.opacity = '0.3';
+            testimonial.style.transform = 'translateY(20px)';
+            testimonial.style.zIndex = '1';
+        }
+    });
+
+    // Auto-rotate every 5 seconds
+    setInterval(() => {
+        // Fade out current
+        testimonials[currentIndex].style.opacity = '0.3';
+        testimonials[currentIndex].style.transform = 'translateY(20px)';
+        testimonials[currentIndex].style.zIndex = '1';
+
+        // Move to next
+        currentIndex = (currentIndex + 1) % totalTestimonials;
+
+        // Fade in next
+        testimonials[currentIndex].style.opacity = '1';
+        testimonials[currentIndex].style.transform = 'translateY(0)';
+        testimonials[currentIndex].style.zIndex = '10';
+    }, 5000);
+
+    // Add click to navigate
+    testimonials.forEach((testimonial, index) => {
+        testimonial.addEventListener('click', () => {
+            if (index === currentIndex) return;
+
+            testimonials[currentIndex].style.opacity = '0.3';
+            testimonials[currentIndex].style.transform = 'translateY(20px)';
+            testimonials[currentIndex].style.zIndex = '1';
+
+            currentIndex = index;
+
+            testimonials[currentIndex].style.opacity = '1';
+            testimonials[currentIndex].style.transform = 'translateY(0)';
+            testimonials[currentIndex].style.zIndex = '10';
+        });
+    });
 }
 
 function setupCyberEffects() {
@@ -1015,7 +1047,7 @@ function initializeCyberAnimations() {
     // Initialize binary background if present
     const binaryStreams = document.querySelectorAll('.binary-stream');
     binaryStreams.forEach(stream => {
-        stream.innerHTML = stream.innerHTML.repeat(4); // Repeat for continuous effect
+        stream.innerHTML = stream.innerHTML.repeat(4);
     });
 }
 
@@ -1196,8 +1228,7 @@ function showToast(message, type = 'info') {
     `;
     
     document.body.appendChild(toast);
-    
-    // Auto remove after 5 seconds
+
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(400px)';
@@ -1205,7 +1236,6 @@ function showToast(message, type = 'info') {
     }, 5000);
 }
 
-// Add toast styles
 const toastStyles = document.createElement('style');
 toastStyles.textContent = `
     .cyber-toast {
@@ -1303,15 +1333,12 @@ async function loadInitialData() {
             animateCounter('certCount', 5000, 2500);
         }, 500);
         
-        // Load any other initial data here
+
     } catch (error) {
         console.error('Failed to load initial data:', error);
     }
 }
 
-// ========================================
-// ANIMATED COUNTER
-// ========================================
 
 function animateCounter(elementId, target, duration = 2000) {
     const element = document.getElementById(elementId);
@@ -1337,6 +1364,133 @@ function animateCounter(elementId, target, duration = 2000) {
     requestAnimationFrame(updateCounter);
 }
 
+
+
+function acceptCookies() {
+    localStorage.setItem('cookiesAccepted', 'true');
+    const banner = document.getElementById('cookieBanner');
+    if (banner) {
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 500);
+    }
+    showSuccess('🍪 Cookies accepted! You can now use all features.');
+    trackEvent('cookies_accepted');
+}
+
+function declineCookies() {
+    localStorage.setItem('cookiesAccepted', 'false');
+    const banner = document.getElementById('cookieBanner');
+    if (banner) {
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 500);
+    }
+    showInfo('🍪 Cookies declined. Some features may be limited.');
+    trackEvent('cookies_declined');
+}
+
+function customizeCookies() {
+    const modal = document.createElement('div');
+    modal.className = 'auth-modal';
+    modal.id = 'cookieSettingsModal';
+    modal.innerHTML = `
+        <div class="modal-content cyber-card">
+            <button class="modal-close" onclick="closeModal('cookieSettingsModal')">
+                <i class="fas fa-xmark"></i>
+            </button>
+            <div class="modal-header">
+                <i class="fas fa-cookie modal-icon cyber-gradient"></i>
+                <h2>Cookie Settings</h2>
+                <p>Choose which cookies you want to allow</p>
+            </div>
+            <div class="cookie-settings-content">
+                <div class="cookie-setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="essentialCookies" checked disabled>
+                        <span><i class="fas fa-check-circle"></i> Essential Cookies <small>(Required)</small></span>
+                    </label>
+                    <p>These cookies are necessary for the website to function properly.</p>
+                </div>
+                
+                <div class="cookie-setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="analyticsCookies" checked>
+                        <span><i class="fas fa-chart-line"></i> Analytics Cookies</span>
+                    </label>
+                    <p>Help us understand how visitors interact with our website.</p>
+                </div>
+                
+                <div class="cookie-setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="functionalCookies" checked>
+                        <span><i class="fas fa-cog"></i> Functional Cookies</span>
+                    </label>
+                    <p>Remember your preferences and settings.</p>
+                </div>
+                
+                <div class="cookie-setting-item">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="marketingCookies">
+                        <span><i class="fas fa-bullhorn"></i> Marketing Cookies</span>
+                    </label>
+                    <p>Used to deliver personalized ads and track marketing campaigns.</p>
+                </div>
+            </div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="saveCookieSettings()">
+                    <i class="fas fa-save"></i> Save Preferences
+                </button>
+                <button class="btn btn-outline" onclick="closeModal('cookieSettingsModal')">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    showModal('cookieSettingsModal');
+    trackEvent('cookies_customize_opened');
+}
+
+function saveCookieSettings() {
+    const settings = {
+        essential: true, 
+        analytics: document.getElementById('analyticsCookies').checked,
+        functional: document.getElementById('functionalCookies').checked,
+        marketing: document.getElementById('marketingCookies').checked
+    };
+    
+    localStorage.setItem('cookieSettings', JSON.stringify(settings));
+    localStorage.setItem('cookiesAccepted', 'custom');
+    
+    closeModal('cookieSettingsModal');
+    const banner = document.getElementById('cookieBanner');
+    if (banner) {
+        banner.style.display = 'none';
+    }
+    
+    showSuccess('✅ Cookie preferences saved!');
+    trackEvent('cookies_customized', settings);
+}
+
+window.addEventListener('load', () => {
+    const cookieBanner = document.getElementById('cookieBanner');
+    const cookiesAccepted = localStorage.getItem('cookiesAccepted');
+    
+    if (cookieBanner && cookiesAccepted === null) {
+        setTimeout(() => {
+            cookieBanner.style.display = 'block';
+            setTimeout(() => {
+                cookieBanner.style.opacity = '1';
+                cookieBanner.style.transform = 'translateY(0)';
+            }, 100);
+        }, 2000);
+    }
+});
 
 window.cyberHub = {
     login,
