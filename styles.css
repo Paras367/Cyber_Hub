@@ -2089,7 +2089,7 @@ footer {
 }
 
 /* ========================================
-   COOKIE BANNER - ENHANCED
+   COOKIE BANNER 
    ======================================== */
 
 .cookie-banner {
@@ -2187,7 +2187,7 @@ footer {
 }
 
 /* ========================================
-   BUTTONS - ENHANCED
+   BUTTONS 
    ======================================== */
 
 .btn {
@@ -2278,7 +2278,7 @@ footer {
 }
 
 /* ========================================
-   RESPONSIVE DESIGN - ENHANCED
+   RESPONSIVE DESIGN 
    ======================================== */
 
 @media (max-width: 768px) {
@@ -2398,6 +2398,40 @@ footer {
     }
 }
 
+/* Cookie Settings Modal */
+.cookie-settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.cookie-setting-item {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.cookie-setting-item:hover {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.cookie-setting-item p {
+    color: #64748b;
+    font-size: 0.9em;
+    margin-top: 8px;
+    margin-left: 30px;
+}
+
+.cookie-setting-item small {
+    color: #94a3b8;
+    font-weight: normal;
+}
+
+
 /* ========================================
    ADDITIONAL UTILITIES
    ======================================== */
@@ -2442,7 +2476,7 @@ footer {
     border-radius: 2px;
 }
 
-/* Loading Overlay */
+
 #loadingOverlay {
     position: fixed;
     top: 0;
