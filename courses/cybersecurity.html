@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Fundamentals - Cyber Learning Hub</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">CyberHub</div>
+                <nav class="nav-links">
+                    <a href="/">Home</a>
+                    <a href="cybersecurity.html">Cybersecurity</a>
+                    <a href="networking.html">Networking</a>
+                    <a href="linux.html">Linux</a>
+                </nav>
+                <div class="auth-section">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="registerBtn">Register</button>
+                    <div id="userMenu" style="display: none; align-items: center; gap: 15px;">
+                        <span id="userName" style="font-weight: 600;"></span>
+                        <button class="btn btn-outline" id="logoutBtn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="course-header">
+            <h1>🔒 Cybersecurity Fundamentals</h1>
+            <p>Master the essential concepts of cybersecurity, from basic threats to advanced defense strategies.</p>
+        </section>
+
+        <section class="modules-section">
+            <h2 class="section-title">Course Modules</h2>
+            
+            <div class="module-card">
+                <h3>Module 1: Introduction to Cybersecurity</h3>
+                <p>Understand the cybersecurity landscape, common threats, and basic security concepts.</p>
+                <div class="module-actions">
+                    <button class="btn btn-primary" onclick="window.location.href='#module1'">Start Learning</button>
+                    <button class="btn btn-success" data-complete data-course="cybersecurity" data-module="module_1">Mark Complete</button>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <h3>Module 2: Threats and Vulnerabilities</h3>
+                <p>Learn about malware, phishing, social engineering, and common attack vectors.</p>
+                <div class="module-actions">
+                    <button class="btn btn-primary">Start Learning</button>
+                    <button class="btn btn-success" data-complete data-course="cybersecurity" data-module="module_2">Mark Complete</button>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <h3>Module 3: Network Security</h3>
+                <p>Explore firewalls, intrusion detection systems, and secure network protocols.</p>
+                <div class="module-actions">
+                    <button class="btn btn-primary">Start Learning</button>
+                    <button class="btn btn-success" data-complete data-course="cybersecurity" data-module="module_3">Mark Complete</button>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <h3>Module 4: Cryptography Basics</h3>
+                <p>Understand encryption, hashing, digital signatures, and key management.</p>
+                <div class="module-actions">
+                    <button class="btn btn-primary">Start Learning</button>
+                    <button class="btn btn-success" data-complete data-course="cybersecurity" data-module="module_4">Mark Complete</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="quiz-container">
+            <h3>Course Quiz</h3>
+            <p>Test your knowledge with this comprehensive quiz covering all modules.</p>
+            <button class="btn btn-primary" onclick="setupQuiz('cybersecurity_quiz')">Start Quiz</button>
+        </section>
+
+        <div class="user-dashboard" id="userDashboard">
+            <h3>Your Progress</h3>
+            <div id="progressContent"></div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="auth-modal" id="loginModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">Login</h2>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <button class="btn btn-primary" onclick="login()" style="width: 100%;">Login</button>
+            <button class="btn btn-outline" onclick="closeModal('loginModal')" style="width: 100%; margin-top: 10px;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="auth-modal" id="registerModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">Register</h2>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="registerUsername" placeholder="Choose username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="registerEmail" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="registerPassword" placeholder="Choose password">
+            </div>
+            <button class="btn btn-primary" onclick="register()" style="width: 100%;">Register</button>
+            <button class="btn btn-outline" onclick="closeModal('registerModal')" style="width: 100%; margin-top: 10px;">Cancel</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Cyber Learning Hub. All rights reserved.</p>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
