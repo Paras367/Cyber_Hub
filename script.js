@@ -5,9 +5,9 @@
 // Layer 1 : Base 64
 const ENCRYPTED_PARTS = {
     p1: 'aHR0cHM6Ly9jeWJlci1odWI=',
-    p2: 'uZGhpbWFucGFyYXM2MDU=',
+    p2: 'ZGhpbWFucGFyYXM2MDU=',
     p3: 'LndvcmtlcnM=',
-    p4: 'uZGV2'
+    p4: 'ZGV2'
 };
 
 // Layer 2: XOR encryption key (rotating)
