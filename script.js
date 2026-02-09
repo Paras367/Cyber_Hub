@@ -1,6 +1,9 @@
 // ========================================
-// CYBER LEARNING HUB - SHARED SCRIPT
+// CYBER LEARNING HUB 
 // ========================================
+
+
+
 
 const ENCRYPTED_WORKER_HASH = '7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b';
 const DECRYPTION_KEY = 'cyber_hub_secret_key_2026';
@@ -14,9 +17,7 @@ const API_BASE = decryptWorkerURL();
 let authToken = localStorage.getItem('authToken');
 let currentUser = null;
 
-// ========================================
-// INITIALIZATION
-// ========================================
+
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuthStatus();
@@ -25,10 +26,454 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initializePage() {
-    // Common initialization for all pages
     setupNavigation();
     setupCourseCards();
 }
+
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.getElementById('preloader').classList.add('hidden');
+    }, 1500);
+});
+
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Mobile menu toggle
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const navMenu = document.getElementById('navMenu');
+const navLinks = document.querySelector('.nav-links');
+
+if (mobileMenuToggle && navMenu) {
+    mobileMenuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('show');
+        const icon = mobileMenuToggle.querySelector('i');
+        if (icon) {
+            icon.classList.toggle('fa-times');
+            icon.classList.toggle('fa-bars');
+        }
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('show');
+            const icon = mobileMenuToggle.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+    });
+}
+
+// Scroll to top button
+const scrollToTopBtn = document.getElementById('scrollToTop');
+
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        scrollToTopBtn.classList.add('show');
+    } else {
+        scrollToTopBtn.classList.remove('show');
+    }
+});
+
+if (scrollToTopBtn) {
+    scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+// Animated counter for stats
+function animateCounter(elementId, target, duration = 2000) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    let start = 0;
+    const increment = target / (duration / 16);
+    
+    const timer = setInterval(() => {
+        start += increment;
+        if (start >= target) {
+            element.textContent = target.toLocaleString();
+            clearInterval(timer);
+        } else {
+            element.textContent = Math.floor(start).toLocaleString();
+        }
+    }, 16);
+}
+
+// Initialize counters when section is in view
+const observerOptions = {
+    threshold: 0.5
+};
+
+const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateCounter('studentCount', 10000, 2000);
+            animateCounter('courseCount', 15, 1500);
+            animateCounter('toolCount', 8, 1200);
+            animateCounter('certCount', 5000, 2500);
+            statsObserver.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+const heroStats = document.querySelector('.hero-stats');
+if (heroStats) {
+    statsObserver.observe(heroStats);
+}
+
+// Password strength checker for registration form
+const registerPasswordInput = document.getElementById('registerPassword');
+if (registerPasswordInput) {
+    registerPasswordInput.addEventListener('input', function() {
+        const password = this.value;
+        const strengthIndicator = document.getElementById('registerPasswordStrength');
+        if (!strengthIndicator) return;
+
+        let score = 0;
+        const feedback = [];
+
+        if (password.length >= 8) score += 25;
+        else feedback.push('Add more characters');
+
+        if (/[A-Z]/.test(password)) score += 25;
+        else feedback.push('Add uppercase letters');
+
+        if (/[a-z]/.test(password)) score += 25;
+        else feedback.push('Add lowercase letters');
+
+        if (/\d/.test(password)) score += 12.5;
+        else feedback.push('Add numbers');
+
+        if (/[^A-Za-z0-9]/.test(password)) score += 12.5;
+        else feedback.push('Add special characters');
+
+        let strength = 'Weak';
+        let color = '#ef4444';
+        
+        if (score >= 80) {
+            strength = 'Strong';
+            color = '#10b981';
+        } else if (score >= 60) {
+            strength = 'Good';
+            color = '#f59e0b';
+        } else if (score >= 40) {
+            strength = 'Moderate';
+            color = '#fbbf24';
+        }
+
+        let feedbackHTML = '';
+        if (feedback.length > 0 && password.length > 0) {
+            feedbackHTML = `<ul style="margin-top: 8px; font-size: 0.85em; color: #64748b;">${feedback.map(f => `<li>${f}</li>`).join('')}</ul>`;
+        }
+
+        strengthIndicator.innerHTML = `
+            <div style="margin-top: 10px;">
+                <div style="background: ${color}; height: 4px; width: 100%; border-radius: 2px; margin-bottom: 5px;">
+                    <div style="background: white; height: 4px; width: ${100 - score}%; border-radius: 2px;"></div>
+                </div>
+                <p style="margin: 5px 0; font-size: 0.85em; color: ${color}; font-weight: 600;">
+                    ${strength} (${Math.round(score)}%)
+                </p>
+                ${feedbackHTML}
+            </div>
+        `;
+    });
+}
+
+// Form validation
+const registerForm = document.querySelector('#registerModal form');
+if (registerForm) {
+    registerForm.addEventListener('submit', function(e) {
+        const password = document.getElementById('registerPassword')?.value;
+        const confirmPassword = document.getElementById('confirmPassword')?.value;
+
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            showError('Passwords do not match!');
+            return false;
+        }
+
+        if (password && password.length < 8) {
+            e.preventDefault();
+            showError('Password must be at least 8 characters long!');
+            return false;
+        }
+    });
+}
+
+// Cookie consent
+function acceptCookies() {
+    localStorage.setItem('cookiesAccepted', 'true');
+    document.getElementById('cookieBanner')?.remove();
+}
+
+function declineCookies() {
+    localStorage.setItem('cookiesAccepted', 'false');
+    document.getElementById('cookieBanner')?.remove();
+}
+
+function customizeCookies() {
+    alert('Cookie customization coming soon!');
+}
+
+// Show cookie banner if not accepted
+window.addEventListener('load', () => {
+    const cookieBanner = document.getElementById('cookieBanner');
+    if (cookieBanner && localStorage.getItem('cookiesAccepted') === null) {
+        setTimeout(() => {
+            cookieBanner.style.display = 'block';
+        }, 2000);
+    }
+});
+
+// Newsletter form submission
+const newsletterForm = document.querySelector('.newsletter-form');
+if (newsletterForm) {
+    newsletterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[type="email"]').value;
+        showSuccess('Thank you for subscribing! You\'ll receive updates soon.');
+        this.reset();
+    });
+}
+
+// Add active class to current navigation link
+window.addEventListener('scroll', () => {
+    const sections = document.querySelectorAll('section[id]');
+    const scrollPos = window.scrollY + 100;
+
+    sections.forEach(section => {
+        if (scrollPos >= section.offsetTop && scrollPos < section.offsetTop + section.offsetHeight) {
+            const id = section.getAttribute('id');
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${id}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+    });
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if user is logged in
+    checkAuthStatus();
+
+    // Setup event listeners
+    setupEventListeners();
+
+    // Initialize page
+    initializePage();
+
+    // Setup navigation
+    setupNavigation();
+});
+
+// Enhanced error/success messages with icons
+function showError(message) {
+    const div = document.createElement('div');
+    div.className = 'toast toast-error';
+    div.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 5000);
+}
+
+function showSuccess(message) {
+    const div = document.createElement('div');
+    div.className = 'toast toast-success';
+    div.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 5000);
+}
+
+function showInfo(message) {
+    const div = document.createElement('div');
+    div.className = 'toast toast-info';
+    div.innerHTML = `
+        <i class="fas fa-info-circle"></i>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 5000);
+}
+
+// Add toast styles to document head
+const toastStyles = document.createElement('style');
+toastStyles.textContent = `
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 8px;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        animation: slideIn 0.3s ease, fadeOut 0.5s ease 4.5s;
+        z-index: 10000;
+        font-weight: 500;
+    }
+
+    .toast i {
+        font-size: 1.2em;
+    }
+
+    .toast button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 1em;
+        margin-left: 15px;
+    }
+
+    .toast-error {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .toast-success {
+        background: linear-gradient(135deg, #10b981, #0da271);
+    }
+
+    .toast-info {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+`;
+document.head.appendChild(toastStyles);
+
+// Tool result animations
+function showToolResult(elementId, content) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerHTML = content;
+        element.style.display = 'block';
+        element.classList.add('show');
+    }
+}
+
+// CTA Register button
+const ctaRegisterBtn = document.getElementById('ctaRegisterBtn');
+if (ctaRegisterBtn) {
+    ctaRegisterBtn.addEventListener('click', () => {
+        showModal('registerModal');
+    });
+}
+
+// Remember me functionality
+const rememberMeCheckbox = document.getElementById('rememberMe');
+if (rememberMeCheckbox) {
+    // Load saved credentials if available
+    const savedUsername = localStorage.getItem('savedUsername');
+    const savedPassword = localStorage.getItem('savedPassword');
+    
+    if (savedUsername && savedPassword) {
+        document.getElementById('loginUsername').value = savedUsername;
+        document.getElementById('loginPassword').value = savedPassword;
+        rememberMeCheckbox.checked = true;
+    }
+
+    rememberMeCheckbox.addEventListener('change', function() {
+        if (!this.checked) {
+            localStorage.removeItem('savedUsername');
+            localStorage.removeItem('savedPassword');
+        }
+    });
+}
+
+// Enhanced login function with remember me
+async function login() {
+    const username = document.getElementById('loginUsername')?.value;
+    const password = document.getElementById('loginPassword')?.value;
+    const rememberMe = document.getElementById('rememberMe')?.checked;
+
+    if (!username || !password) {
+        showError('Please fill in all fields');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/api/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            authToken = data.token;
+            localStorage.setItem('authToken', authToken);
+            currentUser = data.user;
+            
+            // Save credentials if remember me is checked
+            if (rememberMe) {
+                localStorage.setItem('savedUsername', username);
+                localStorage.setItem('savedPassword', password);
+            } else {
+                localStorage.removeItem('savedUsername');
+                localStorage.removeItem('savedPassword');
+            }
+
+            closeModal('loginModal');
+            updateAuthUI(true);
+            showSuccess('Login successful!');
+            loadUserProgress();
+        } else {
+            showError(data.error || 'Login failed');
+        }
+    } catch (error) {
+        showError('Login failed. Please try again.');
+        console.error('Login error:', error);
+    }
+}
+
+console.log('Cyber Learning Hub initialized successfully! 🚀');
 
 // ========================================
 // AUTHENTICATION FUNCTIONS
